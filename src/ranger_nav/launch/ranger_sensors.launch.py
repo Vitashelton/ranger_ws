@@ -26,7 +26,7 @@ def generate_launch_description():
             '--y', '0.0',
             '--z', '0.70',
             '--roll', '0.0',
-            '--pitch', '0.0',
+            '--pitch', '0.523599',
             '--yaw', '0.0',
             '--frame-id', 'base_link',
             '--child-frame-id', 'livox_frame',

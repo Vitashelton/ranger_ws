@@ -1,35 +1,18 @@
-/**:
+pointcloud_to_laserscan:
   ros__parameters:
-    # Input point cloud topic (from Livox MID360S)
-    cloud_in: /livox/lidar
-
-    # Output LaserScan topic
-    scan: /scan
-
-    # Frame to transform the point cloud into before slicing
     target_frame: base_link
-
-    # TF tolerance (seconds)
     transform_tolerance: 0.2
 
-    # LiDAR tilted 30° up at z=0.70. With ~40° FOV, bottom rays hit ~10° above horizontal.
-    # At d=0.5m bottom hit: z=0.79m; at d=1.5m: z=0.96m.
-    # Old filter 1.0-3.5: walls closer than ~1.6m invisible → no near-field features → drift.
-    # Now capture 0.3-4.0m: near walls visible, far walls still captured.
-    min_height: 0.3
-    max_height: 4.0
+    min_height: -1.0
+    max_height: 2.0
 
-    # Angular resolution of output LaserScan (radians)
     angle_min: -3.14159
     angle_max: 3.14159
-    angle_increment: 0.0087266   # ~0.5 deg -> 720 points
+    angle_increment: 0.0087
 
-    # Range limits (meters) — walls are the main feature at this height
+    scan_time: 0.1
     range_min: 0.3
-    range_max: 15.0
+    range_max: 10.0
 
-    # No inf — empty directions become 0 rather than confusing SLAM
-    use_inf: false
-
-    # Concurrency level
-    concurrency_level: 1
+    use_inf: true
+    inf_epsilon: 1.0

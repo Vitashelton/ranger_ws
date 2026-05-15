@@ -1,0 +1,61 @@
+# FAST-LIO2 configuration for Ranger Mini 2.0 + Livox MID360S
+#
+# This config uses the MID360 built-in IMU (published by livox_ros_driver2 on /livox/imu).
+# LiDAR extrinsics: mounted on Ranger at x=0.30, z=0.70, 30° upward tilt.
+# These are handled by the static TF base_link->livox_frame; FAST-LIO2 uses
+# identity extrinsics since IMU and LiDAR are co-located inside the MID360 housing.
+
+/**:
+    ros__parameters:
+
+        # --- Top-level ---
+        feature_extract_enable: false      # false = use all points (better for non-repetitive scan)
+        point_filter_num: 2                # downsample: keep 1 per N points (1=off, 3=heavy)
+        max_iteration: 4                   # ICP iterations per scan
+        filter_size_surf: 0.3              # surface point voxel filter (m)
+        filter_size_map: 0.3               # map point voxel filter (m)
+        cube_side_length: 1000.0           # local map cube size (m)
+        runtime_pos_log_enable: false
+
+        # --- Topics & time ---
+        common:
+            lid_topic: "/livox/lidar"
+            imu_topic: "/livox/imu"
+            time_sync_en: false            # MID360 has hardware sync via livox_ros_driver2
+            time_offset_lidar_to_imu: 0.0
+
+        # --- LiDAR preprocess ---
+        preprocess:
+            lidar_type: 1                  # 1 = Livox custom msg
+            scan_line: 4                   # MID360 = 4 lines
+            blind: 0.5                     # min range (m) — filter out self-hits
+            timestamp_unit: 3              # 3 = nanoseconds (Livox convention)
+            scan_rate: 10                  # Hz
+
+        # --- IMU & extrinsics ---
+        mapping:
+            acc_cov: 0.1                   # accelerometer noise covariance
+            gyr_cov: 0.1                   # gyroscope noise covariance
+            b_acc_cov: 0.0001              # accel bias covariance
+            b_gyr_cov: 0.0001              # gyro bias covariance
+            fov_degree: 360.0              # MID360 = 360° FOV
+            det_range: 100.0               # max detection range (m)
+            extrinsic_est_en: false        # extrinsics are known (identity for built-in IMU)
+            extrinsic_T: [0.0, 0.0, 0.0]   # LiDAR translation in IMU frame
+            extrinsic_R: [1.0, 0.0, 0.0,   # LiDAR rotation in IMU frame (identity)
+                          0.0, 1.0, 0.0,
+                          0.0, 0.0, 1.0]
+
+        # --- Publish ---
+        publish:
+            path_en: true                  # /path topic (odom trajectory)
+            effect_map_en: false           # debug: effects pointcloud
+            map_en: true                   # map pointcloud (accumulated)
+            scan_publish_en: true          # /cloud_registered (current scan in world frame)
+            dense_publish_en: false        # dense map (can throttle CPU)
+            scan_bodyframe_pub_en: true    # /cloud_registered_body (scan in IMU body frame)
+
+        # --- PCD save ---
+        pcd_save:
+            pcd_save_en: true
+            interval: -1                   # -1 = save all as one PCD; >0 = save every N frames

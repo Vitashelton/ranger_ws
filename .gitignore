@@ -1,0 +1,63 @@
+# ROS2 / colcon build outputs
+build/
+install/
+log/
+
+# Paper drafts, private writing, unfinished manuscript
+paper/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# CMake / compile cache
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# ROS bag / recorded data
+*.bag
+*.db3
+*.mcap
+*.active
+rosbag2_*/
+
+# Large sensor data
+*.pcd
+*.ply
+*.las
+*.laz
+*.avi
+*.mp4
+*.mov
+*.mkv
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+
+# Secrets / local machine configs
+.env
+*.secret

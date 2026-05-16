@@ -39,7 +39,6 @@ def generate_launch_description():
     livox_config = os.path.join(
         '/home/robot/livox_ws/src/livox_ros_driver2', 'config', 'MID360s_config.json'
     )
-
     livox_driver = Node(
         package='livox_ros_driver2',
         executable='livox_ros_driver2_node',

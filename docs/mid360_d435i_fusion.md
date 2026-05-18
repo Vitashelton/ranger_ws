@@ -9,75 +9,7 @@
 
 ## 2. Fusion Architecture
 
-```
-┌─────────────────────────────────────────────────┐
-│                Sensor Layer                      │
-│  ┌──────────────┐         ┌──────────────┐      │
-│  │  MID360S     │         │  D435i       │      │
-│  │  /livox/lidar│         │  /camera/    │      │
-│  │              │         │  depth/color/│      │
-│  │              │         │  points      │      │
-│  └──────┬───────┘         └──────┬───────┘      │
-│         │                        │               │
-├─────────┼────────────────────────┼───────────────┤
-│         ▼                        ▼               │
-│  ┌──────────────┐         ┌──────────────┐      │
-│  │ ROI Filter   │         │ ROI Filter   │      │
-│  │ Voxel Down   │         │ Range: 0.2-  │      │
-│  │ Ground Remove│         │  4.0m        │      │
-│  └──────┬───────┘         │ Height: 0-   │      │
-│         │                 │  1.5m        │      │
-│         ▼                 └──────┬───────┘      │
-│  ┌──────────────┐                │               │
-│  │ Euclidean    │                ▼               │
-│  │ Clustering   │         ┌──────────────┐      │
-│  │ tol=0.15m    │         │ Depth-based  │      │
-│  └──────┬───────┘         │ Clustering   │      │
-│         │                 │ tol=0.08m    │      │
-│         ▼                 └──────┬───────┘      │
-│  /obstacles_mid360                │               │
-│  (MarkerArray)                    ▼               │
-│                          /obstacles_d435i         │
-│                          (MarkerArray)            │
-│                          /near_field_safety_zone  │
-│                          (Marker)                 │
-│         │                        │               │
-├─────────┼────────────────────────┼───────────────┤
-│         └──────────┬─────────────┘               │
-│                    ▼                              │
-│  ┌─────────────────────────────────────┐         │
-│  │        Sensor Fusion Node           │         │
-│  │                                     │         │
-│  │  1. Approximate time sync           │         │
-│  │  2. Spatial association             │         │
-│  │  3. Obstacle merging                │         │
-│  │  4. Confidence assignment           │         │
-│  └────────────────┬────────────────────┘         │
-│                   ▼                               │
-│  /fused_obstacles (MarkerArray + confidence)      │
-│                   │                               │
-│                   ▼                               │
-│  ┌─────────────────────────────────────┐         │
-│  │        Tracker + Predictor          │         │
-│  │                                     │         │
-│  │  Kalman Filter (px, py, vx, vy)     │         │
-│  │  Hungarian data association         │         │
-│  │  Constant-velocity prediction       │         │
-│  └────────────────┬────────────────────┘         │
-│                   ▼                               │
-│  /tracked_obstacles + /predicted_obstacles        │
-│                   │                               │
-│                   ▼                               │
-│  ┌─────────────────────────────────────┐         │
-│  │        Risk Evaluator               │         │
-│  │                                     │         │
-│  │  TTC, min_dist, confidence-weighted │         │
-│  └────────────────┬────────────────────┘         │
-│                   ▼                               │
-│  /risk_markers (MarkerArray)                      │
-└─────────────────────────────────────────────────┘
-```
-
+![Fusion Architecture](/img/sensor_fusion_risk_pipeline.drawio.png)
 ## 3. Obstacle Association Algorithm
 
 ```

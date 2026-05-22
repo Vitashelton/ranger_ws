@@ -44,20 +44,25 @@ class D435iObstacleNode(Node):
         self.declare_parameter('safety_zone_y_half_width', 0.4)
         self.declare_parameter('safety_critical_range', 0.3)
         self.declare_parameter('max_obstacles', 30)
-        self.declare_parameter('frame_id', 'base_link')
+        self.declare_parameter('input_topic', '/camera/depth/color/points')
+        self.declare_parameter('frame_id', 'camera_init')
+        self.declare_parameter('camera_optical_to_robot_frame', True)
+
 
         self._load_params()
 
         # --- Sub / Pub ---
         self.sub = self.create_subscription(
-            PointCloud2, '/camera/depth/color/points', self._callback, 10)
+            PointCloud2, self.input_topic, self._callback, 10)
         self.obs_pub = self.create_publisher(MarkerArray, '/obstacles_d435i', 10)
         self.zone_pub = self.create_publisher(Marker, '/near_field_safety_zone', 10)
+        self.get_logger().info(f'd435i_obstacle_node started, input={self.input_topic}, frame={self.frame}')
 
-        self.get_logger().info('d435i_obstacle_node started')
 
     def _load_params(self):
         p = lambda name: self.get_parameter(name).value
+        self.input_topic = p('input_topic')
+        self.optical_to_robot = p('camera_optical_to_robot_frame')
         self.max_range = p('max_range')
         self.min_range = p('min_range')
         self.min_h = p('min_height')
@@ -79,6 +84,13 @@ class D435iObstacleNode(Node):
         if len(pts) == 0:
             self.obs_pub.publish(MarkerArray())
             return
+        # D435i optical frame: x right, y down, z forward
+        # Robot frame: x forward, y left, z up
+        if self.optical_to_robot:
+            x = pts[:, 2].copy()
+            y = -pts[:, 0].copy()
+            z = -pts[:, 1].copy()
+            pts = np.stack((x, y, z), axis=1)
 
         # 1. ROI filter: range + height
         r = np.sqrt(pts[:, 0]**2 + pts[:, 1]**2 + pts[:, 2]**2)

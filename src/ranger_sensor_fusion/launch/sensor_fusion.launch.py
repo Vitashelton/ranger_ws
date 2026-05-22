@@ -17,16 +17,25 @@ def generate_launch_description():
         name='obstacle_cluster_node',
         output='screen',
         parameters=[{
-            'roi_x_min': 0.3,
-            'roi_x_max': 15.0,
-            'roi_z_min': 0.1,
-            'roi_z_max': 2.0,
-            'voxel_leaf_size': 0.1,
-            'cluster_tolerance': 0.15,
-            'min_cluster_size': 5,
-            'frame_id': 'base_link',
+            'input_topic': '/cloud_registered',
+
+            'roi_x_min': -20.0,
+            'roi_x_max': 20.0,
+            'roi_y_min': -20.0,
+            'roi_y_max': 20.0,
+            'roi_z_min': -3.0,
+            'roi_z_max': 5.0,
+
+            'voxel_leaf_size': 0.25,
+            'cluster_tolerance': 0.5,
+            'min_cluster_size': 3,
+            'max_cluster_size': 200000,
+            'max_obstacles': 100,
+
+            'frame_id': 'camera_init',
         }],
     )
+
 
     d435i_obstacle = Node(
         package='ranger_sensor_fusion',
@@ -44,7 +53,7 @@ def generate_launch_description():
             'safety_zone_x_max': 1.0,
             'safety_zone_y_half_width': 0.4,
             'safety_critical_range': 0.3,
-            'frame_id': 'base_link',
+            'frame_id': 'camera_init',
         }],
     )
 
@@ -54,16 +63,22 @@ def generate_launch_description():
         name='sensor_fusion_node',
         output='screen',
         parameters=[{
-            'association_max_dist': 0.5,
-            'max_timestamp_diff': 0.1,
+            'association_max_dist': 0.7,
+            'max_timestamp_diff': 0.2,
             'mid360_base_confidence': 0.85,
             'd435i_base_confidence': 0.8,
             'dual_detection_confidence': 0.95,
             'min_confidence_threshold': 0.3,
             'risk_enabled': True,
-            'frame_id': 'base_link',
+            'frame_id': 'camera_init',
+
+            'mid360_obstacles_topic': '/obstacles_mid360',
+            'd435i_obstacles_topic': '/obstacles_d435i',
+            'fused_obstacles_topic': '/fused_obstacles',
+            'risk_markers_topic': '/risk_markers',
         }],
     )
+
 
     return LaunchDescription([
         obstacle_cluster,

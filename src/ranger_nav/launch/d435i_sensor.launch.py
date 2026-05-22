@@ -31,7 +31,7 @@ def generate_launch_description():
             '--y', '0.0',         # centered
             '--z', '0.60',        # [TBD] height above ground
             '--roll', '0.0',
-            '--pitch', '-0.2618', # [TBD] -15° downward tilt
+            '--pitch', '0.0', # [TBD] -15° downward tilt
             '--yaw', '0.0',
             '--frame-id', 'base_link',
             '--child-frame-id', 'camera_link',
@@ -43,23 +43,25 @@ def generate_launch_description():
     d435i_node = Node(
         package='realsense2_camera',
         executable='realsense2_camera_node',
-        name='realsense2_camera',
+        name='camera',
+        namespace='',
         output='screen',
         parameters=[{
+            'camera_name': 'camera',
+
             'enable_color': True,
             'enable_depth': True,
-            'enable_infra1': False,
-            'enable_infra2': False,
-            'enable_gyro': False,
-            'enable_accel': False,
-            'depth_module.depth_profile': '640x480x15',
-            'rgb_camera.color_profile': '640x480x15',
+
             'align_depth.enable': True,
-            'publish_tf': True,     # camera_link -> optical_frame TFs
-            'tf_publish_rate': 0.0,
             'pointcloud.enable': True,
-            'pointcloud.stream_filter_index': 0,
-        }],
+
+            'enable_gyro': True,
+            'enable_accel': True,
+            'unite_imu_method': 2,
+
+            'depth_module.profile': '640x480x30',
+            'rgb_camera.profile': '640x480x30',
+        }]
     )
 
     return LaunchDescription([

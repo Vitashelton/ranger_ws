@@ -53,8 +53,13 @@ class SensorFusionNode(Node):
         self.declare_parameter('dual_detection_confidence', 0.95)
         self.declare_parameter('temporal_consistency_bonus', 0.05)
         self.declare_parameter('min_confidence_threshold', 0.3)
-        self.declare_parameter('frame_id', 'base_link')
+        self.declare_parameter('frame_id', 'camera_init')
         self.declare_parameter('risk_enabled', True)
+        self.declare_parameter('mid360_obstacles_topic', '/obstacles_mid360')
+        self.declare_parameter('d435i_obstacles_topic', '/obstacles_d435i')
+        self.declare_parameter('fused_obstacles_topic', '/fused_obstacles')
+        self.declare_parameter('risk_markers_topic', '/risk_markers')
+
 
         self._load_params()
 
@@ -66,18 +71,29 @@ class SensorFusionNode(Node):
 
         # Subscribers
         self.mid360_sub = self.create_subscription(
-            MarkerArray, '/obstacles_mid360', self._mid360_cb, 10)
+            MarkerArray, self.mid360_topic, self._mid360_cb, 10)
+
         self.d435i_sub = self.create_subscription(
-            MarkerArray, '/obstacles_d435i', self._d435i_cb, 10)
+            MarkerArray, self.d435i_topic, self._d435i_cb, 10)
+
+        self.fused_pub = self.create_publisher(
+            MarkerArray, self.fused_topic, 10)
+
+        self.risk_pub = self.create_publisher(
+            MarkerArray, self.risk_topic, 10)
 
         # Publishers
-        self.fused_pub = self.create_publisher(MarkerArray, '/fused_obstacles', 10)
-        self.risk_pub = self.create_publisher(MarkerArray, '/risk_markers', 10)
+        self.fused_pub = self.create_publisher(MarkerArray, self.fused_topic, 10)
+        self.risk_pub = self.create_publisher(MarkerArray, self.risk_topic, 10)
+
 
         # Timer: fuse on fixed rate (handles sensor rate mismatch)
         self.timer = self.create_timer(0.1, self._fuse_callback)
 
-        self.get_logger().info('sensor_fusion_node started')
+        self.get_logger().info(
+            f'sensor_fusion_node started: {self.mid360_topic} + {self.d435i_topic} -> {self.fused_topic}, frame={self.frame}'
+        )
+
 
     def _load_params(self):
         p = lambda name: self.get_parameter(name).value
@@ -94,6 +110,13 @@ class SensorFusionNode(Node):
         self.conf_min = p('min_confidence_threshold')
         self.frame = p('frame_id')
         self.risk_enabled = p('risk_enabled')
+        self.frame = p('frame_id')
+        self.risk_enabled = p('risk_enabled')
+        self.mid360_topic = p('mid360_obstacles_topic')
+        self.d435i_topic = p('d435i_obstacles_topic')
+        self.fused_topic = p('fused_obstacles_topic')
+        self.risk_topic = p('risk_markers_topic')
+
 
     def _mid360_cb(self, msg):
         self.mid360_obs = msg.markers

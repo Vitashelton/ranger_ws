@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 MID360S pointcloud obstacle clustering node.
-
-Input:  /livox/lidar (PointCloud2)
+Input:  /cloud_registered (PointCloud2, from FAST-LIO)
 Output: /obstacles_mid360 (MarkerArray)
+
 
 Pipeline: ROI filter -> voxel downsample -> ground removal -> Euclidean clustering.
 
@@ -24,12 +24,47 @@ from geometry_msgs.msg import Point
 
 
 def _pointcloud2_to_xyz(pc_msg):
-    """Extract (N, 3) float32 array from PointCloud2. Returns empty on failure."""
+    """Read PointCloud2 as normal Nx3 float32 array."""
     field_names = {f.name for f in pc_msg.fields}
-    if not ('x' in field_names and 'y' in field_names and 'z' in field_names):
+    if not {'x', 'y', 'z'}.issubset(field_names):
         return np.empty((0, 3), dtype=np.float32)
-    gen = point_cloud2.read_points(pc_msg, field_names=('x', 'y', 'z'), skip_nans=True)
-    return np.array(list(gen), dtype=np.float32)
+
+    try:
+        pts = point_cloud2.read_points_numpy(
+            pc_msg,
+            field_names=('x', 'y', 'z'),
+            skip_nans=True
+        )
+        pts = np.asarray(pts, dtype=np.float32)
+        pts = pts.reshape(-1, 3)
+        pts = pts[np.isfinite(pts).all(axis=1)]
+        return pts
+    except Exception:
+        pts = point_cloud2.read_points(
+            pc_msg,
+            field_names=('x', 'y', 'z'),
+            skip_nans=True
+        )
+
+        if isinstance(pts, np.ndarray):
+            if pts.dtype.names is not None:
+                arr = np.column_stack((pts['x'], pts['y'], pts['z'])).astype(np.float32)
+            else:
+                arr = np.asarray(pts, dtype=np.float32).reshape(-1, 3)
+            arr = arr[np.isfinite(arr).all(axis=1)]
+            return arr
+
+        data = []
+        for p in pts:
+            data.append((float(p[0]), float(p[1]), float(p[2])))
+
+        if len(data) == 0:
+            return np.empty((0, 3), dtype=np.float32)
+
+        arr = np.asarray(data, dtype=np.float32)
+        arr = arr[np.isfinite(arr).all(axis=1)]
+        return arr
+
 
 
 def _euler_to_quaternion(roll, pitch, yaw):
@@ -51,11 +86,11 @@ class ObstacleClusterNode(Node):
         super().__init__('obstacle_cluster_node')
 
         # --- Params ---
-        self.declare_parameter('roi_x_min', 0.3)
+        self.declare_parameter('roi_x_min', -5.0)
         self.declare_parameter('roi_x_max', 15.0)
         self.declare_parameter('roi_y_min', -8.0)
         self.declare_parameter('roi_y_max', 8.0)
-        self.declare_parameter('roi_z_min', 0.1)
+        self.declare_parameter('roi_z_min', -1.0)
         self.declare_parameter('roi_z_max', 2.0)
         self.declare_parameter('voxel_leaf_size', 0.1)
         self.declare_parameter('ground_ransac_dist_thresh', 0.05)
@@ -63,19 +98,21 @@ class ObstacleClusterNode(Node):
         self.declare_parameter('min_cluster_size', 5)
         self.declare_parameter('max_cluster_size', 5000)
         self.declare_parameter('max_obstacles', 50)
-        self.declare_parameter('frame_id', 'base_link')
+        self.declare_parameter('input_topic', '/cloud_registered')
+        self.declare_parameter('frame_id', 'camera_init')
+
 
         self._load_params()
 
         # --- Sub / Pub ---
         self.sub = self.create_subscription(
-            PointCloud2, '/livox/lidar', self._callback, 10)
+            PointCloud2, self.input_topic, self._callback, 10)
         self.pub = self.create_publisher(MarkerArray, '/obstacles_mid360', 10)
-
-        self.get_logger().info('obstacle_cluster_node started')
+        self.get_logger().info(f'obstacle_cluster_node started, input={self.input_topic}, frame={self.frame}')
 
     def _load_params(self):
         p = lambda name: self.get_parameter(name).value
+        self.input_topic = p('input_topic')
         self.roi_x = (p('roi_x_min'), p('roi_x_max'))
         self.roi_y = (p('roi_y_min'), p('roi_y_max'))
         self.roi_z = (p('roi_z_min'), p('roi_z_max'))
@@ -110,7 +147,7 @@ class ObstacleClusterNode(Node):
         pts = self._voxel_downsample(pts)
 
         # 3. Ground removal (simple RANSAC plane)
-        pts = self._remove_ground(pts)
+        # pts = self._remove_ground(pts)
 
         if len(pts) < self.min_cluster:
             self.pub.publish(MarkerArray())
@@ -122,20 +159,22 @@ class ObstacleClusterNode(Node):
         # 5. Publish
         markers = self._clusters_to_markers(clusters, msg.header.stamp)
         self.pub.publish(markers)
-
         dt = (time.time() - t0) * 1000.0
         self.get_logger().debug(f'Processed {len(pts)} pts -> {len(clusters)} clusters in {dt:.1f} ms')
 
     def _voxel_downsample(self, pts):
-        """Simple voxel grid: keep centroid of each occupied cell."""
+        """Simple voxel grid: keep one point per occupied voxel."""
         if self.voxel_size <= 0:
             return pts
-        # Scale to integer grid, average per cell
-        scaled = np.floor(pts / self.voxel_size).astype(np.int32)
-        # Unique cell keys via structured array
-        keys = scaled[:, 0] + scaled[:, 1] * 100000 + scaled[:, 2] * 10000000000
-        _, idx, counts = np.unique(keys, return_index=True, return_counts=True)
-        # For cells with multiple points, keep the centroid (approximate: keep first)
+
+        scaled = np.floor(pts / self.voxel_size).astype(np.int64)
+
+        _, idx = np.unique(
+            scaled,
+            axis=0,
+            return_index=True
+        )
+
         return pts[idx]
 
     def _remove_ground(self, pts):
@@ -164,37 +203,45 @@ class ObstacleClusterNode(Node):
         return pts  # not enough ground -> keep all
 
     def _euclidean_cluster(self, pts):
-        """KDTree-based Euclidean clustering."""
-        tree = KDTree(pts[:, :2])  # 2D clustering (ignore z for obstacle grouping)
+        """KDTree-based 3D Euclidean clustering."""
+        tree = KDTree(pts)
         visited = np.zeros(len(pts), dtype=bool)
         clusters = []
 
         for i in range(len(pts)):
             if visited[i]:
                 continue
-            # BFS
+
             queue = [i]
             visited[i] = True
             cluster_pts = []
+
             while queue:
                 idx = queue.pop()
                 cluster_pts.append(idx)
-                neighbors = tree.query_ball_point(pts[idx, :2], self.cluster_tol)
+
+                neighbors = tree.query_ball_point(pts[idx], self.cluster_tol)
                 for nb in neighbors:
                     if not visited[nb]:
                         visited[nb] = True
                         queue.append(nb)
+
             if self.min_cluster <= len(cluster_pts) <= self.max_cluster:
                 clusters.append(pts[cluster_pts])
+
             if len(clusters) >= self.max_obs:
                 break
+
         return clusters
+
 
     def _clusters_to_markers(self, clusters, stamp):
         markers = MarkerArray()
         for i, c in enumerate(clusters):
-            cx, cy = np.mean(c[:, 0]), np.mean(c[:, 1])
-            cz = np.mean(c[:, 2])
+            cx = float(np.mean(c[:, 0]))
+            cy = float(np.mean(c[:, 1]))
+            cz = float(np.mean(c[:, 2]))
+
             w = float(np.ptp(c[:, 0]) + 0.1)
             d = float(np.ptp(c[:, 1]) + 0.1)
             h = float(np.ptp(c[:, 2]) + 0.1)
@@ -204,7 +251,7 @@ class ObstacleClusterNode(Node):
             m.header.stamp = stamp
             m.ns = 'mid360_obstacles'
             m.id = i
-            m.type = Marker.CYLINDER
+            m.type = Marker.CUBE
             m.action = Marker.ADD
             m.pose.position.x = cx
             m.pose.position.y = cy

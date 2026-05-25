@@ -1,0 +1,130 @@
+# fusion_modes.yaml — Ablation experiment mode definitions.
+#
+# Each mode enables/disables specific sensor sources.
+# Modes:
+#   1. lidar_only              — MID360S LiDAR obstacles only
+#   2. depth_only              — D435i depth obstacles only
+#   3. yolo_only               — YOLOv8 person detections only
+#   4. lidar_depth_fusion      — LiDAR + depth obstacles fused
+#   5. lidar_depth_yolo_fusion — LiDAR + depth + YOLO fused
+#   6. fusion_with_risk_avoidance — Full fusion + risk-aware avoidance
+
+modes:
+  lidar_only:
+    description: "MID360S 3D LiDAR obstacle detection only"
+    use_lidar: true
+    use_depth: false
+    use_yolo: false
+    use_fusion: false
+    use_risk_avoidance: false
+    use_ground_truth_for_control: false
+    sensors_enabled: ["lidar"]
+    fusion_enabled: false
+    risk_enabled: false
+    controller_enabled: true
+    expected_outputs:
+      - /obstacles_mid360
+
+  depth_only:
+    description: "D435i depth obstacle detection only"
+    use_lidar: false
+    use_depth: true
+    use_yolo: false
+    use_fusion: false
+    use_risk_avoidance: false
+    use_ground_truth_for_control: false
+    sensors_enabled: ["depth"]
+    fusion_enabled: false
+    risk_enabled: false
+    controller_enabled: true
+    expected_outputs:
+      - /obstacles_d435i
+
+  yolo_only:
+    description: "YOLOv8 person detection only"
+    use_lidar: false
+    use_depth: false
+    use_yolo: true
+    use_fusion: false
+    use_risk_avoidance: false
+    use_ground_truth_for_control: false
+    sensors_enabled: ["yolo"]
+    fusion_enabled: false
+    risk_enabled: false
+    controller_enabled: true
+    yolo_device: "cpu"
+    expected_outputs:
+      - /yolo/person_detections
+      - /obstacles_yolo_person
+
+  lidar_depth_fusion:
+    description: "LiDAR + depth obstacles fused via confidence-weighted Hungarian"
+    use_lidar: true
+    use_depth: true
+    use_yolo: false
+    use_fusion: true
+    use_risk_avoidance: false
+    use_ground_truth_for_control: false
+    sensors_enabled: ["lidar", "depth"]
+    fusion_enabled: true
+    risk_enabled: true
+    controller_enabled: true
+    expected_outputs:
+      - /obstacles_mid360
+      - /obstacles_d435i
+      - /fused_obstacles
+      - /risk_markers
+
+  lidar_depth_yolo_fusion:
+    description: "LiDAR + depth + YOLO fused — full sensor suite without risk-aware control"
+    use_lidar: true
+    use_depth: true
+    use_yolo: true
+    use_fusion: true
+    use_risk_avoidance: false
+    use_ground_truth_for_control: false
+    sensors_enabled: ["lidar", "depth", "yolo"]
+    fusion_enabled: true
+    risk_enabled: true
+    controller_enabled: true
+    yolo_device: "cpu"
+    expected_outputs:
+      - /obstacles_mid360
+      - /obstacles_d435i
+      - /obstacles_yolo_person
+      - /fused_obstacles
+      - /risk_markers
+
+  fusion_with_risk_avoidance:
+    description: "Full multi-sensor fusion + risk-aware avoidance controller (proposed method)"
+    use_lidar: true
+    use_depth: true
+    use_yolo: true
+    use_fusion: true
+    use_risk_avoidance: true
+    use_ground_truth_for_control: false
+    sensors_enabled: ["lidar", "depth", "yolo"]
+    fusion_enabled: true
+    risk_enabled: true
+    controller_enabled: true
+    yolo_device: "cpu"
+    expected_outputs:
+      - /obstacles_mid360
+      - /obstacles_d435i
+      - /obstacles_yolo_person
+      - /fused_obstacles
+      - /risk_markers
+      - /local_goal
+      - /avoidance_debug
+
+# Experiment defaults
+experiment_defaults:
+  trial_timeout: 120.0       # max seconds per trial
+  goal_tolerance: 0.5        # meters from goal considered success
+  random_seeds: [0, 1, 2, 3, 4]  # default seeds for ablation
+  scenarios:
+    - crossing_person
+    - doorway_person
+    - same_direction_person
+    - opposite_direction_person
+    - multi_person_corridor

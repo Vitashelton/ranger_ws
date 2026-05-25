@@ -59,7 +59,8 @@ class SensorFusionNode(Node):
         self.declare_parameter('d435i_obstacles_topic', '/obstacles_d435i')
         self.declare_parameter('fused_obstacles_topic', '/fused_obstacles')
         self.declare_parameter('risk_markers_topic', '/risk_markers')
-
+        self.declare_parameter('yolo_obstacles_topic', '')
+        self.declare_parameter('yolo_base_confidence', 0.75)
 
         self._load_params()
 
@@ -67,6 +68,8 @@ class SensorFusionNode(Node):
         self.mid360_obs = None
         self.mid360_stamp = None
         self.d435i_obs = None
+        self.yolo_obs = None
+        self.yolo_stamp = None
         self.d435i_stamp = None
 
         # Subscribers
@@ -75,6 +78,12 @@ class SensorFusionNode(Node):
 
         self.d435i_sub = self.create_subscription(
             MarkerArray, self.d435i_topic, self._d435i_cb, 10)
+
+        self.yolo_sub = None
+        if self.yolo_topic:
+            self.yolo_sub = self.create_subscription(
+                MarkerArray, self.yolo_topic, self._yolo_cb, 10)
+            self.get_logger().info(f'YOLO fusion enabled: subscribing to {self.yolo_topic}')
 
         self.fused_pub = self.create_publisher(
             MarkerArray, self.fused_topic, 10)
@@ -116,6 +125,8 @@ class SensorFusionNode(Node):
         self.d435i_topic = p('d435i_obstacles_topic')
         self.fused_topic = p('fused_obstacles_topic')
         self.risk_topic = p('risk_markers_topic')
+        self.yolo_topic = p('yolo_obstacles_topic')
+        self.conf_yolo_base = p('yolo_base_confidence')
 
 
     def _mid360_cb(self, msg):
@@ -126,11 +137,16 @@ class SensorFusionNode(Node):
         self.d435i_obs = msg.markers
         self.d435i_stamp = msg.markers[0].header.stamp if msg.markers else self.get_clock().now()
 
+    def _yolo_cb(self, msg):
+        self.yolo_obs = msg.markers
+        self.yolo_stamp = msg.markers[0].header.stamp if msg.markers else self.get_clock().now()
+
     def _fuse_callback(self):
         mid = self.mid360_obs or []
         d435 = self.d435i_obs or []
+        yolo = self.yolo_obs or []
 
-        if not mid and not d435:
+        if not mid and not d435 and not yolo:
             self.fused_pub.publish(MarkerArray())
             if self.risk_enabled:
                 self.risk_pub.publish(MarkerArray())
@@ -141,8 +157,9 @@ class SensorFusionNode(Node):
         # 1. Compute confidence for each obstacle
         mid_conf = [self._mid360_confidence(m) for m in mid]
         d435_conf = [self._d435i_confidence(m) for m in d435]
+        yolo_conf = [self._yolo_confidence(m) for m in yolo]
 
-        # 2. Build distance matrix and run Hungarian
+        # 2. Fuse MID360 + D435i via Hungarian
         N, M = len(mid), len(d435)
         if N > 0 and M > 0:
             cost = np.full((N, M), 1e9)
@@ -170,7 +187,7 @@ class SensorFusionNode(Node):
         fused = []
         stamp = now.to_msg()
 
-        # Matched pairs: merge
+        # Matched pairs: merge MID360 + D435i
         for ri, ci in matched:
             m_mid, m_d435 = mid[ri], d435[ci]
             conf = min(self.conf_dual, 1.0 - (1.0 - mid_conf[ri]) * (1.0 - d435_conf[ci]))
@@ -183,21 +200,43 @@ class SensorFusionNode(Node):
                 m = self._copy_marker(mid[i], f'fused_{i}')
                 m.ns = 'fused_mid360_only'
                 m.color.r, m.color.g, m.color.b, m.color.a = 0.0, 1.0, 0.0, 0.6
-                # Attach confidence as text (use marker text field in RViz)
                 fused.append(m)
 
         # Unmatched D435i obstacles
-        offset = N
+        off_d = N
         for j in range(M):
             if j not in paired_d435 and d435_conf[j] >= self.conf_min:
-                m = self._copy_marker(d435[j], f'fused_{offset+j}')
+                m = self._copy_marker(d435[j], f'fused_{off_d + j}')
                 m.ns = 'fused_d435i_only'
                 m.color.r, m.color.g, m.color.b, m.color.a = 0.0, 0.0, 1.0, 0.6
                 fused.append(m)
 
+        # 4. Add YOLO person obstacles (matched against existing fused obstacles)
+        matched_yolo = set()
+        for yi, ym in enumerate(yolo):
+            if yolo_conf[yi] < self.conf_min:
+                continue
+            # Check if YOLO person matches any existing fused obstacle
+            matched_existing = False
+            for fi, fm in enumerate(fused):
+                dx = ym.pose.position.x - fm.pose.position.x
+                dy = ym.pose.position.y - fm.pose.position.y
+                if math.hypot(dx, dy) < self.assoc_dist * 1.5:  # wider gate for person matching
+                    # Boost confidence of existing obstacle
+                    fm.color.a = min(1.0, fm.color.a + 0.2)
+                    matched_existing = True
+                    matched_yolo.add(yi)
+                    break
+            if not matched_existing:
+                m = self._copy_marker(ym, f'fused_yolo_{yi}')
+                m.ns = 'fused_yolo_person'
+                m.color.r, m.color.g, m.color.b = 1.0, 0.0, 1.0
+                m.color.a = float(yolo_conf[yi])
+                fused.append(m)
+
         self.fused_pub.publish(MarkerArray(markers=fused))
 
-        # 4. Risk markers (simplified: danger zones around each obstacle)
+        # 5. Risk markers
         if self.risk_enabled:
             self.risk_pub.publish(self._build_risk_markers(fused, stamp))
 
@@ -218,6 +257,16 @@ class SensorFusionNode(Node):
             return 0.4
         t = (r - self.conf_d435i_decay_s) / (self.conf_d435i_decay_e - self.conf_d435i_decay_s)
         return self.conf_d435i_base + t * (0.4 - self.conf_d435i_base)
+
+    def _yolo_confidence(self, m):
+        """YOLO detection confidence — primarily from marker alpha/color."""
+        base = max(self.conf_yolo_base, m.color.a) if hasattr(m.color, 'a') and m.color.a > 0 else self.conf_yolo_base
+        r = math.hypot(m.pose.position.x, m.pose.position.y)
+        if r > 15.0:
+            return base * 0.5
+        if r > 8.0:
+            return base * 0.7
+        return base
 
     def _merge_obstacles(self, m_mid, m_d435, conf, stamp):
         """Confidence-weighted average of two obstacle markers."""

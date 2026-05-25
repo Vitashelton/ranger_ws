@@ -43,19 +43,26 @@ def generate_launch_description():
         name='d435i_obstacle_node',
         output='screen',
         parameters=[{
+            'input_topic': '/camera/depth/color/points',
+            'camera_optical_to_robot_frame': True,
+
             'max_range': 4.0,
             'min_range': 0.2,
-            'min_height': 0.0,
+            'min_height': -0.2,
             'max_height': 1.5,
             'cluster_tolerance': 0.08,
             'min_cluster_size': 10,
+            'max_cluster_size': 5000,
+
             'safety_zone_x_min': 0.1,
             'safety_zone_x_max': 1.0,
             'safety_zone_y_half_width': 0.4,
             'safety_critical_range': 0.3,
+
             'frame_id': 'camera_init',
         }],
     )
+
 
     sensor_fusion = Node(
         package='ranger_sensor_fusion',

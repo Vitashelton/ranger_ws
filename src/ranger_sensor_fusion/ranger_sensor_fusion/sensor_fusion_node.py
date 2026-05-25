@@ -14,7 +14,7 @@ import time
 
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-
+from builtin_interfaces.msg import Duration
 import rclpy
 from rclpy.node import Node
 from visualization_msgs.msg import Marker, MarkerArray
@@ -238,6 +238,7 @@ class SensorFusionNode(Node):
         m.id = m_mid.id
         m.type = Marker.CYLINDER
         m.action = Marker.ADD
+        m.lifetime = Duration(sec=0, nanosec=500000000)
 
         m.pose.position.x = w_mid * m_mid.pose.position.x + w_d435 * m_d435.pose.position.x
         m.pose.position.y = w_mid * m_mid.pose.position.y + w_d435 * m_d435.pose.position.y

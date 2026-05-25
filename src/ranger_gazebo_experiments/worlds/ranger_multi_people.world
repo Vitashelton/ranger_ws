@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="ranger_multi_people">
+    <scene>
+      <ambient>0.4 0.4 0.4 1.0</ambient>
+      <background>0.7 0.8 0.9 1.0</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <include><uri>model://sun</uri></include>
+    <include><uri>model://ground_plane</uri></include>
+
+    <model name="lab_floor">
+      <static>true</static>
+      <pose>0 0 -0.005 0 0 0</pose>
+      <link name="floor_link">
+        <visual name="floor_visual">
+          <geometry><plane><normal>0 0 1</normal><size>30 30</size></plane></geometry>
+          <material><ambient>0.5 0.45 0.4 1.0</ambient><diffuse>0.5 0.45 0.4 1.0</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Walls -->
+    <model name="wall_north"><static>true</static><pose>5 3 1.25 0 0 0</pose>
+      <link name="link"><visual name="v"><geometry><box><size>20 0.15 2.5</size></box></geometry><material><ambient>0.8 0.75 0.7 1.0</ambient></material></visual><collision name="c"><geometry><box><size>20 0.15 2.5</size></box></geometry></collision></link></model>
+    <model name="wall_south"><static>true</static><pose>5 -3 1.25 0 0 0</pose>
+      <link name="link"><visual name="v"><geometry><box><size>20 0.15 2.5</size></box></geometry><material><ambient>0.8 0.75 0.7 1.0</ambient></material></visual><collision name="c"><geometry><box><size>20 0.15 2.5</size></box></geometry></collision></link></model>
+
+    <model name="wall_east"><static>true</static><pose>13.5 0 1.25 0 0 0</pose>
+      <link name="link"><visual name="v"><geometry><box><size>0.15 6 2.5</size></box></geometry><material><ambient>0.8 0.75 0.7 1.0</ambient></material></visual><collision name="c"><geometry><box><size>0.15 6 2.5</size></box></geometry></collision></link></model>
+
+    <!-- ========== Actor 1: Crossing person ========== -->
+    <actor name="person_1">
+      <skin><filename>model://walking_person/meshes/walking.dae</filename></skin>
+      <animation name="walking">
+        <filename>model://walking_person/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0.0</time><pose>6.0 -2.0 1.0 0 0 0</pose></waypoint>
+          <waypoint><time>4.0</time><pose>6.0 2.0 1.0 0 0 0</pose></waypoint>
+          <waypoint><time>8.0</time><pose>6.0 -2.0 1.0 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <model name="person_1_proxy">
+      <static>false</static>
+      <pose>6.0 -2.0 0.875 0 0 0</pose>
+      <link name="proxy_link">
+        <visual name="proxy_visual">
+          <geometry><cylinder><radius>0.25</radius><length>1.75</length></cylinder></geometry>
+          <material><ambient>0 0 0 0.05</ambient></material>
+          <transparency>0.95</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="proxy_collision">
+          <geometry><cylinder><radius>0.25</radius><length>1.75</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- ========== Actor 2: Same-direction person (walks ahead of robot) ========== -->
+    <actor name="person_2">
+      <skin><filename>model://walking_person/meshes/walking.dae</filename></skin>
+      <animation name="walking">
+        <filename>model://walking_person/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>1.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0.0</time><pose>3.0 0.0 1.0 0 0 0</pose></waypoint>
+          <waypoint><time>12.0</time><pose>10.0 0.0 1.0 0 0 0</pose></waypoint>
+          <waypoint><time>24.0</time><pose>3.0 0.0 1.0 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <model name="person_2_proxy">
+      <static>false</static>
+      <pose>3.0 0.0 0.875 0 0 0</pose>
+      <link name="proxy_link">
+        <visual name="proxy_visual">
+          <geometry><cylinder><radius>0.25</radius><length>1.75</length></cylinder></geometry>
+          <material><ambient>0 0 0 0.05</ambient></material>
+          <transparency>0.95</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="proxy_collision">
+          <geometry><cylinder><radius>0.25</radius><length>1.75</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <!-- ========== Actor 3: Opposite-direction person ========== -->
+    <actor name="person_3">
+      <skin><filename>model://walking_person/meshes/walking.dae</filename></skin>
+      <animation name="walking">
+        <filename>model://walking_person/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>2.0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walking">
+          <waypoint><time>0.0</time><pose>10.0 1.5 1.0 0 0 0</pose></waypoint>
+          <waypoint><time>10.0</time><pose>1.0 -1.5 1.0 0 0 0</pose></waypoint>
+          <waypoint><time>20.0</time><pose>10.0 1.5 1.0 0 0 0</pose></waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <model name="person_3_proxy">
+      <static>false</static>
+      <pose>10.0 1.5 0.875 0 0 0</pose>
+      <link name="proxy_link">
+        <visual name="proxy_visual">
+          <geometry><cylinder><radius>0.25</radius><length>1.75</length></cylinder></geometry>
+          <material><ambient>0 0 0 0.05</ambient></material>
+          <transparency>0.95</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <collision name="proxy_collision">
+          <geometry><cylinder><radius>0.25</radius><length>1.75</length></cylinder></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <gravity>0 0 -9.8</gravity>
+    <physics name="default_physics" type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000.0</real_time_update_rate>
+    </physics>
+  </world>
+</sdf>

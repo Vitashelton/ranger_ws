@@ -1,0 +1,121 @@
+# people_scenarios.yaml — Dynamic human actor scenario definitions for Ranger Gazebo experiments.
+#
+# Each scenario defines trajectories, speeds, and actor parameters.
+# Trajectory waypoints are in world frame (Gazebo world coordinates).
+
+scenarios:
+  crossing_person:
+    description: "Person crosses perpendicularly in front of robot path"
+    random_seed: 42
+    people:
+      - name: "crossing_person_1"
+        start_pose: {x: 5.0, y: -2.0, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 5.0, y: 2.0, z: 0.0, yaw: 0.0}
+        speed: 1.2          # m/s
+        pause_time: 0.0     # seconds at end before looping
+        loop: true
+        trajectory_points:
+          - [5.0, -2.0, 0.0]
+          - [5.0, 2.0, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+
+  doorway_person:
+    description: "Person suddenly appears from doorway and crosses path"
+    random_seed: 43
+    people:
+      - name: "doorway_person_1"
+        start_pose: {x: 4.0, y: 3.0, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 4.0, y: -3.0, z: 0.0, yaw: 0.0}
+        speed: 1.0
+        pause_time: 3.0
+        loop: true
+        trajectory_points:
+          - [4.0, 3.0, 0.0]
+          - [4.0, -3.0, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+
+  same_direction_person:
+    description: "Person walks same direction ahead of robot"
+    random_seed: 44
+    people:
+      - name: "same_dir_person_1"
+        start_pose: {x: 3.0, y: 0.0, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 8.0, y: 0.0, z: 0.0, yaw: 0.0}
+        speed: 0.6
+        pause_time: 2.0
+        loop: true
+        trajectory_points:
+          - [3.0, 0.0, 0.0]
+          - [8.0, 0.0, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+
+  opposite_direction_person:
+    description: "Person walks toward robot from opposite direction"
+    random_seed: 45
+    people:
+      - name: "opposite_person_1"
+        start_pose: {x: 8.0, y: 1.0, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 0.0, y: -1.0, z: 0.0, yaw: 0.0}
+        speed: 1.0
+        pause_time: 2.0
+        loop: true
+        trajectory_points:
+          - [8.0, 1.0, 0.0]
+          - [0.0, -1.0, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+
+  multi_person_corridor:
+    description: "2-3 people in corridor with different trajectories"
+    random_seed: 46
+    people:
+      - name: "multi_person_1"
+        start_pose: {x: 6.0, y: -1.5, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 6.0, y: 1.5, z: 0.0, yaw: 0.0}
+        speed: 1.0
+        pause_time: 1.0
+        loop: true
+        trajectory_points:
+          - [6.0, -1.5, 0.0]
+          - [6.0, 1.5, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+      - name: "multi_person_2"
+        start_pose: {x: 3.0, y: 0.0, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 9.0, y: 0.0, z: 0.0, yaw: 0.0}
+        speed: 0.5
+        pause_time: 2.0
+        loop: true
+        trajectory_points:
+          - [3.0, 0.0, 0.0]
+          - [9.0, 0.0, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+      - name: "multi_person_3"
+        start_pose: {x: 8.0, y: 2.0, z: 0.0, yaw: 0.0}
+        end_pose:   {x: 10.0, y: -1.0, z: 0.0, yaw: 0.0}
+        speed: 0.8
+        pause_time: 1.0
+        loop: true
+        trajectory_points:
+          - [8.0, 2.0, 0.0]
+          - [10.0, -1.0, 0.0]
+        bounding_box: {x: 0.4, y: 0.4, z: 1.75}
+        visible_actor_model: "walking_person"
+        proxy_size: {radius: 0.25, height: 1.75}
+
+# Default actor appearance parameters
+actor_defaults:
+  skin: "walking.dae"
+  animation: "walking.dae"
+  animation_scale: 1.0
+  model_path: "model://walking_person"

@@ -62,3 +62,5 @@ env/
 # Secrets / local machine configs
 .env
 *.secret
+*.tex
+*.png

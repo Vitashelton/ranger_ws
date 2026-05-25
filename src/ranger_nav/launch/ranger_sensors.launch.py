@@ -16,8 +16,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg_dir = get_package_share_directory('ranger_nav')
 
-    # --- Static TF: base_link -> livox_frame ---
-    static_tf = Node(
+    lidar_static_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='lidar_static_tf',
@@ -26,16 +25,31 @@ def generate_launch_description():
             '--y', '0.0',
             '--z', '0.70',
             '--roll', '0.0',
-            '--pitch', '0.523599',
+            '--pitch', '0.523599',  # 30度
             '--yaw', '0.0',
             '--frame-id', 'base_link',
             '--child-frame-id', 'livox_frame',
         ],
         output='screen',
     )
+    camera_static_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_static_tf',
+        arguments=[
+            '--x', '0.35',
+            '--y', '0.0',
+            '--z', '0.60',
+            '--roll', '0.0',
+            '--pitch', '0.0',
+            '--yaw', '0.0',
+            '--frame-id', 'base_link',
+            '--child-frame-id', 'camera_link',
+        ],
+        output='screen',
+    )
 
     # --- Livox MID360S driver ---
-    # Config JSON path on the Jetson
     livox_config = os.path.join(
         '/home/robot/livox_ws/src/livox_ros_driver2', 'config', 'MID360s_config.json'
     )
@@ -57,25 +71,33 @@ def generate_launch_description():
         }],
     )
 
-    # --- PointCloud2 -> LaserScan ---
-    # pcl_to_scan_config = os.path.join(
-    #     pkg_dir, 'config', 'pointcloud_to_laserscan.yaml'
-    # )
+    # --- D435i camera driver ---
+    d435i_node = Node(
+        package='realsense2_camera',
+        executable='realsense2_camera_node',
+        name='camera',
+        namespace='',
+        output='screen',
+        parameters=[{
+            'camera_name': 'camera',
 
-    # pcl_to_scan = Node(
-    #     package='pointcloud_to_laserscan',
-    #     executable='pointcloud_to_laserscan_node',
-    #     name='pointcloud_to_laserscan',
-    #     output='screen',
-    #     parameters=[pcl_to_scan_config],
-    #     remappings=[
-    #         ('cloud_in', '/livox/lidar'),
-    #         ('scan', '/scan'),
-    #     ],
-    # )
+            'enable_color': True,
+            'enable_depth': True,
 
+            'align_depth.enable': True,
+            'pointcloud.enable': True,
+
+            'enable_gyro': True,
+            'enable_accel': True,
+            'unite_imu_method': 2,
+
+            'depth_module.profile': '640x480x30',
+            'rgb_camera.profile': '640x480x30',
+        }]
+    )
     return LaunchDescription([
-        static_tf,
-        livox_driver,
-        # pcl_to_scan,
+        lidar_static_tf,   # 雷达TF
+        camera_static_tf,  # 相机TF
+        livox_driver,      # 雷达驱动
+        d435i_node,        # 相机驱动
     ])

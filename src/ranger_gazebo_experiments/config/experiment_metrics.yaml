@@ -1,0 +1,69 @@
+# experiment_metrics.yaml — Experiment metrics recorder configuration.
+
+experiment_metrics:
+  ros__parameters:
+    output_dir: "/home/zbx/ranger_ws/experiments/results"
+    log_rate: 10.0                     # Hz — record metrics at this rate
+
+    # Subscribed topics
+    odom_topic: "/odom"
+    cmd_vel_topic: "/cmd_vel"
+    ground_truth_topic: "/sim/people_ground_truth"
+    yolo_detections_topic: "/yolo/person_detections"
+    fused_obstacles_topic: "/fused_obstacles"
+    risk_markers_topic: "/risk_markers"
+    goal_pose_topic: "/goal_pose"
+
+    # Thresholds (must match ablation protocol)
+    dangerous_close_distance: 0.35    # meters — person closer than this = dangerous close
+    collision_distance: 0.25          # meters — person closer than this = collision / failure
+    goal_tolerance: 0.5               # meters — robot within this of goal = success
+    stuck_velocity_threshold: 0.03    # m/s — below this for too long = stuck
+    stuck_duration_threshold: 15.0    # seconds
+
+    # CSV fields to record (all enabled by default)
+    record_fields:
+      - timestamp
+      - scenario_name
+      - random_seed
+      - mode
+      - person_count
+      - robot_x
+      - robot_y
+      - robot_yaw
+      - goal_x
+      - goal_y
+      - distance_to_goal
+      - cmd_linear
+      - cmd_angular
+      - min_distance_to_person
+      - collision_count
+      - dangerous_close_count
+      - yolo_detection_count
+      - yolo_miss_count
+      - detector_fps
+      - detector_latency_ms
+      - fused_obstacle_count
+      - high_risk_count
+      - stop_count
+      - replan_count
+      - path_length
+      - average_speed
+      - navigation_time
+      - success
+      - failure_reason
+
+    # Summary fields computed at end of trial
+    summary_fields:
+      - success_rate
+      - average_navigation_time
+      - average_path_length
+      - average_min_distance
+      - total_collision_count
+      - total_dangerous_close_count
+      - average_detector_latency
+      - yolo_miss_rate
+      - average_speed
+      - stop_count
+      - replan_count
+      - git_commit

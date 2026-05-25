@@ -1,0 +1,20 @@
+# yolo_detector.yaml — YOLOv8 person detector configuration.
+
+yolo_detector:
+  ros__parameters:
+    model_path: "yolov8n.pt"           # model weights file (auto-download if not found)
+    confidence_threshold: 0.35         # minimum confidence to include detection (0-1)
+    iou_threshold: 0.45               # NMS IOU threshold
+    device: "cpu"                     # "cpu", "cuda:0", "mps"
+    image_topic: "/camera/color/image_raw"
+    camera_info_topic: "/camera/color/camera_info"
+    detections_topic: "/yolo/person_detections"
+    debug_image_topic: "/yolo/person_debug_image"
+    markers_topic: "/yolo/person_markers"
+    publish_markers: true
+    publish_debug_image: true
+    target_class: "person"             # only detect this class
+    tracker_enabled: false             # optional ByteTrack person tracking
+    frame_id: "camera_color_optical_frame"
+    # Performance
+    max_image_width: 640               # resize input to this max width (0 = no resize)

@@ -1,0 +1,165 @@
+<mxGraphModel>
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- Title -->
+    <mxCell id="title" value="Simulation &amp; Experiment Environment — ranger_gazebo_experiments" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="100" y="15" width="800" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== GAZEBO WORLD ==================== -->
+    <mxCell id="world_bg" value="Gazebo Simulation World" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#37474F;startSize=30;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="70" width="940" height="150" as="geometry"/>
+    </mxCell>
+
+    <!-- Available worlds -->
+    <mxCell id="w1" value="ranger_lab_corridor&lt;br&gt;Standard corridor&lt;br&gt;+ static obstacles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="world_bg">
+      <mxGeometry x="20" y="40" width="140" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="w2" value="ranger_low_obstacle&lt;br&gt;Low-height obstacles&lt;br&gt;(blind-zone test)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="world_bg">
+      <mxGeometry x="180" y="40" width="140" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="w3" value="ranger_people_corridor&lt;br&gt;Single pedestrian&lt;br&gt;crossing scenario" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="world_bg">
+      <mxGeometry x="340" y="40" width="140" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="w4" value="ranger_multi_people&lt;br&gt;Multiple pedestrians&lt;br&gt;complex interactions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#546E7A;fontSize=10;" vertex="1" parent="world_bg">
+      <mxGeometry x="500" y="40" width="140" height="55" as="geometry"/>
+    </mxCell>
+
+    <!-- URDF -->
+    <mxCell id="w_urdf" value="Ranger Mini URDF&lt;br&gt;(ranger_mini_sim.urdf.xacro)&lt;br&gt;Tracked chassis + MID360 + D435i" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90A4AE;strokeColor=#37474F;fontSize=10;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="world_bg">
+      <mxGeometry x="680" y="35" width="230" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Animated actors -->
+    <mxCell id="w_actors" value="Animated Actors&lt;br&gt;(pedestrian models)&lt;br&gt;Scripted trajectories&lt;br&gt;from people_scenarios.yaml" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B0BEC5;strokeColor=#37474F;fontSize=10;" vertex="1" parent="world_bg">
+      <mxGeometry x="680" y="105" width="230" height="0" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== GROUND TRUTH ==================== -->
+    <mxCell id="gt_bg" value="Ground Truth System" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#283593;startSize=25;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="235" width="940" height="85" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="gt_scenario" value="people_scenarios.yaml&lt;br&gt;Pedestrian trajectories:&lt;br&gt;waypoints, timing, speed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3949AB;fontSize=10;" vertex="1" parent="gt_bg">
+      <mxGeometry x="20" y="30" width="170" height="48" as="geometry"/>
+    </mxCell>
+    <mxCell id="gt_node" value="simulated_people_ground_truth_node&lt;br&gt;Publishes: /sim/people_ground_truth (PoseArray)&lt;br&gt;/sim/people_markers (MarkerArray)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9FA8DA;strokeColor=#283593;fontSize=10;fontStyle=1;" vertex="1" parent="gt_bg">
+      <mxGeometry x="230" y="28" width="350" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="gt_proxy" value="actor_proxy_sync_node&lt;br&gt;Moves invisible collision&lt;br&gt;proxies via Gazebo service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3949AB;fontSize=10;" vertex="1" parent="gt_bg">
+      <mxGeometry x="620" y="28" width="190" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="gt_a1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#3949AB;strokeWidth=1.5;endArrow=classic;" edge="1" parent="gt_bg" source="gt_scenario" target="gt_node">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="gt_a2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#3949AB;strokeWidth=1.5;endArrow=classic;" edge="1" parent="gt_bg" source="gt_node" target="gt_proxy">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== PERCEPTION IN SIM ==================== -->
+    <mxCell id="simperc_bg" value="Perception Nodes in Simulation (reuse or adapt real pipeline)" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;startSize=25;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="335" width="940" height="120" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="sp_lidar" value="simulated_lidar_obstacle_adapter&lt;br&gt;PointCloud2 pass-through&lt;br&gt;(Gazebo lidar → obstacle_cluster)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="simperc_bg">
+      <mxGeometry x="20" y="35" width="210" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="sp_depth" value="simulated_depth_obstacle_adapter&lt;br&gt;PointCloud2 pass-through&lt;br&gt;(Gazebo depth → d435i_obstacle)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="simperc_bg">
+      <mxGeometry x="260" y="35" width="210" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="sp_yolo" value="yolo_person_detector_node&lt;br&gt;YOLOv8 on /camera/color/image_raw&lt;br&gt;Publishes: /yolo/person_detections&lt;br&gt;/yolo/person_debug_image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;fontSize=10;fontStyle=1;" vertex="1" parent="simperc_bg">
+      <mxGeometry x="500" y="32" width="210" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="sp_convert" value="person_detection_to_obstacle_node&lt;br&gt;2D YOLO det → 3D obstacle&lt;br&gt;(depth + camera_info)&lt;br&gt;→ /obstacles_yolo_person" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#388E3C;fontSize=10;" vertex="1" parent="simperc_bg">
+      <mxGeometry x="740" y="30" width="185" height="60" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="sp_a1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#388E3C;strokeWidth=1.5;endArrow=classic;" edge="1" parent="simperc_bg" source="sp_yolo" target="sp_convert">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== AVOIDANCE CONTROLLER ==================== -->
+    <mxCell id="avoid_bg" value="Standalone Avoidance Controller (for Ablation Studies)" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;startSize=25;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="470" width="940" height="100" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="av_input" value="Inputs:&lt;br&gt;/odom&lt;br&gt;/fused_obstacles&lt;br&gt;/local_goal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;fontSize=10;" vertex="1" parent="avoid_bg">
+      <mxGeometry x="20" y="33" width="140" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="av_logic" value="person_avoidance_controller&lt;br&gt;Reactive vector-field avoidance&lt;br&gt;Repulsive force from obstacles&lt;br&gt;Attractive force toward goal&lt;br&gt;→ /cmd_vel" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#BF360C;fontSize=10;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="avoid_bg">
+      <mxGeometry x="200" y="30" width="230" height="60" as="geometry"/>
+    </mxCell>
+    <mxCell id="av_note" value="Ablation baseline:&lt;br&gt;replaces Nav2 stack&lt;br&gt;for pure sensor-fusion&lt;br&gt;navigation evaluation" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#FFF8E1;strokeColor=#F57F17;fontSize=10;align=left;" vertex="1" parent="avoid_bg">
+      <mxGeometry x="480" y="30" width="180" height="60" as="geometry"/>
+    </mxCell>
+    <mxCell id="av_out" value="/cmd_vel" style="shape=parallelogram;whiteSpace=wrap;html=1;perimeter=parallelogramStyle;fillColor=#E65100;strokeColor=#BF360C;fontSize=11;fontColor=#FFFFFF;fontStyle=1;" vertex="1" parent="avoid_bg">
+      <mxGeometry x="720" y="40" width="100" height="40" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== EXPERIMENT MANAGEMENT ==================== -->
+    <mxCell id="exp_bg" value="Experiment Management &amp; Metrics" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;startSize=25;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="585" width="940" height="120" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="exp_config" value="fusion_modes.yaml&lt;br&gt;Ablation config:&lt;br&gt;MID360-only, D435i-only,&lt;br&gt;Fusion, Fusion+YOLO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=10;" vertex="1" parent="exp_bg">
+      <mxGeometry x="20" y="33" width="155" height="60" as="geometry"/>
+    </mxCell>
+    <mxCell id="exp_runner" value="ablation_runner_node&lt;br&gt;Trial Lifecycle:&lt;br&gt;config→run→monitor→record&lt;br&gt;Success: goal reached&lt;br&gt;Timeout: 120s max" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#6A1B9A;fontSize=10;fontStyle=1;" vertex="1" parent="exp_bg">
+      <mxGeometry x="210" y="30" width="185" height="65" as="geometry"/>
+    </mxCell>
+    <mxCell id="exp_metrics" value="experiment_metrics_node&lt;br&gt;30+ CSV columns per trial:&lt;br&gt;position, velocity, goal_distance,&lt;br&gt;people_distances, TTC, risk_level,&lt;br&gt;replan_count, collision_count..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AB47BC;strokeColor=#4A148C;fontSize=10;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="exp_bg">
+      <mxGeometry x="430" y="28" width="215" height="70" as="geometry"/>
+    </mxCell>
+    <mxCell id="exp_scripts" value="Analysis Scripts&lt;br&gt;run_all_ablation_trials.py&lt;br&gt;summarize_experiment_csv.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#7B1FA2;fontSize=10;" vertex="1" parent="exp_bg">
+      <mxGeometry x="685" y="33" width="180" height="60" as="geometry"/>
+    </mxCell>
+
+    <!-- Experiment arrows -->
+    <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#7B1FA2;strokeWidth=1.5;endArrow=classic;" edge="1" parent="exp_bg" source="exp_config" target="exp_runner">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ea2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#7B1FA2;strokeWidth=1.5;endArrow=classic;" edge="1" parent="exp_bg" source="exp_runner" target="exp_metrics">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="ea3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#7B1FA2;strokeWidth=1.5;endArrow=classic;" edge="1" parent="exp_bg" source="exp_metrics" target="exp_scripts">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== LAUNCH ORCHESTRATION ==================== -->
+    <mxCell id="launch_bg" value="Launch Orchestration" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;startSize=25;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="720" width="940" height="70" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="l_lab" value="ranger_lab_world.launch.py&lt;br&gt;Gazebo + URDF + RViz only" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF176;strokeColor=#F9A825;fontSize=10;" vertex="1" parent="launch_bg">
+      <mxGeometry x="20" y="30" width="210" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="l_fusion" value="ranger_lab_fusion_demo.launch.py&lt;br&gt;Lab + Sensor Fusion Pipeline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF176;strokeColor=#F9A825;fontSize=10;" vertex="1" parent="launch_bg">
+      <mxGeometry x="250" y="30" width="220" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="l_people" value="ranger_people_avoidance_demo.launch.py&lt;br&gt;Full People Avoidance Demo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCA28;strokeColor=#F57F17;fontSize=10;fontStyle=1;" vertex="1" parent="launch_bg">
+      <mxGeometry x="490" y="30" width="220" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="l_ablation" value="ranger_ablation_experiment.launch.py&lt;br&gt;Batch Ablation Experiment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCA28;strokeColor=#F57F17;fontSize=10;fontStyle=1;" vertex="1" parent="launch_bg">
+      <mxGeometry x="730" y="30" width="195" height="35" as="geometry"/>
+    </mxCell>
+
+    <!-- ==================== CROSS-MODULE ARROWS ==================== -->
+    <mxCell id="x_gt_sim" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#283593;strokeWidth=1.5;endArrow=classic;dashed=1;" edge="1" parent="1" source="gt_node" target="sp_yolo">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="980" y="285"/>
+          <mxPoint x="980" y="400"/>
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="x_perc_avoid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#E65100;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="simperc_bg" target="avoid_bg">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    <mxCell id="x_avoid_exp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#7B1FA2;strokeWidth=1.5;endArrow=classic;dashed=1;" edge="1" parent="1" source="avoid_bg" target="exp_bg">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

@@ -50,7 +50,8 @@ rosbag2_*/
 # OS files
 .DS_Store
 Thumbs.db
-
+*.drawio
+*.pdf
 # Python virtual environments
 .venv/
 venv/

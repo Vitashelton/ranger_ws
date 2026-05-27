@@ -21,7 +21,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Twist, Pose, Point, PoseStamped
+from geometry_msgs.msg import Twist, Pose, Point, PoseStamped,PoseArray
 from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import String, Bool
 

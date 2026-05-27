@@ -14,13 +14,13 @@ Usage:
     use_lidar:=true use_depth:=true use_yolo:=false mode:=lidar_depth_fusion
 """
 import os
-
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, Command, FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -44,20 +44,37 @@ def generate_launch_description():
     ]
 
     # Gazebo + robot
+    world_path = PathJoinSubstitution([pkg_dir, 'worlds', LaunchConfiguration('world')])
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py')),
         launch_arguments={
-            'world': os.path.join(pkg_dir, 'worlds', 'ranger_lab_corridor.world'),
+            'world': world_path,
         }.items(),
     )
-
     urdf_path = os.path.join(pkg_dir, 'urdf', 'ranger_mini_sim.urdf.xacro')
-    robot_state_pub = Node(
-        package='robot_state_publisher', executable='robot_state_publisher',
-        name='robot_state_publisher', output='screen',
-        parameters=[{'robot_description': ['xacro ', urdf_path]}],
+
+    robot_description = ParameterValue(
+        Command([
+            FindExecutable(name='xacro'),
+            ' ',
+            urdf_path,
+        ]),
+        value_type=str,
     )
+
+    robot_state_pub = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'robot_description': robot_description,
+            'use_sim_time': True,
+        }],
+    )
+
+
 
     spawn_robot = Node(
         package='gazebo_ros', executable='spawn_entity.py',
@@ -66,6 +83,15 @@ def generate_launch_description():
                    '-x', '0.0', '-y', '0.0', '-z', '0.1'],
     )
 
+    # Odom-to-TF bridge: ensures the full TF chain reaches /tf even if
+    # robot_state_publisher static transforms on /tf_static aren't chained
+    # by RViz's message filter, and as fallback for diff_drive TF publishing.
+    # odom_tf_bridge = Node(
+    #     package='ranger_gazebo_experiments', executable='odom_to_tf_bridge',
+    #     name='odom_to_tf_bridge', output='screen',
+    #     parameters=[{'use_sim_time': True}],
+    # )
+
     # MID360 obstacle clustering (configured for simulation LiDAR topic)
     obstacle_cluster = Node(
         package='ranger_sensor_fusion', executable='obstacle_cluster_node',
@@ -73,6 +99,7 @@ def generate_launch_description():
         parameters=[{
             'input_topic': '/livox/lidar',
             'frame_id': 'odom',
+            'use_sim_time': True,
             'roi_x_min': -20.0, 'roi_x_max': 20.0,
             'roi_y_min': -20.0, 'roi_y_max': 20.0,
             'roi_z_min': -3.0, 'roi_z_max': 5.0,
@@ -88,6 +115,7 @@ def generate_launch_description():
         parameters=[{
             'input_topic': '/camera/depth/color/points',
             'frame_id': 'odom',
+            'use_sim_time': True,
             'camera_optical_to_robot_frame': True,
             'max_range': 4.0, 'min_range': 0.2,
             'min_height': -0.2, 'max_height': 1.5,
@@ -105,6 +133,7 @@ def generate_launch_description():
             'fused_obstacles_topic': '/fused_obstacles',
             'risk_markers_topic': '/risk_markers',
             'frame_id': 'odom',
+            'use_sim_time': True,
             'risk_enabled': True,
             'yolo_obstacles_topic': '/obstacles_yolo_person',
         }],
@@ -112,11 +141,17 @@ def generate_launch_description():
 
     # RViz
     rviz_node = Node(
-        package='rviz2', executable='rviz2', name='rviz2', output='screen',
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
         arguments=['-d', os.path.join(pkg_dir, 'rviz', 'ranger_lab_fusion.rviz')],
+        parameters=[{'use_sim_time': True}],
     )
+
 
     return LaunchDescription([
         *args, gazebo, robot_state_pub, spawn_robot,
+        # odom_tf_bridge,
         obstacle_cluster, d435i_obstacle, sensor_fusion, rviz_node,
     ])

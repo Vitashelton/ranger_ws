@@ -12,10 +12,13 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription,TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration,Command, FindExecutable
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
+from launch.conditions import IfCondition
+
 
 
 def generate_launch_description():
@@ -58,11 +61,22 @@ def generate_launch_description():
 
     # Robot
     urdf_path = os.path.join(pkg_dir, 'urdf', 'ranger_mini_sim.urdf.xacro')
-    robot_state_pub = Node(
-        package='robot_state_publisher', executable='robot_state_publisher',
-        name='robot_state_publisher', output='screen',
-        parameters=[{'robot_description': ['xacro ', urdf_path]}],
+    robot_description = ParameterValue(
+        Command([FindExecutable(name='xacro'), ' ', urdf_path]),
+        value_type=str
     )
+
+    robot_state_pub = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'robot_description': robot_description,
+            'use_sim_time': True,
+        }],
+    )
+
     spawn_robot = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         name='spawn_ranger', output='screen',
@@ -88,13 +102,18 @@ def generate_launch_description():
         name='actor_proxy_sync_node', output='screen',
         parameters=[{'ground_truth_topic': '/sim/people_ground_truth', 'update_rate': 30.0}],
     )
+    use_yolo = LaunchConfiguration('use_yolo')
 
     # YOLO person detector
     yolo_detector = Node(
-        package='ranger_gazebo_experiments', executable='yolo_person_detector_node',
-        name='yolo_person_detector_node', output='screen',
+        package='ranger_gazebo_experiments',
+        executable='yolo_person_detector_node',
+        name='yolo_person_detector_node',
+        output='screen',
+        condition=IfCondition(use_yolo),
         parameters=[{
-            'model_path': 'yolov8n.pt',
+            'use_sim_time': True,
+            'model_path': os.path.join(pkg_dir, 'models', 'yolov8n.pt'),
             'confidence_threshold': 0.35,
             'iou_threshold': 0.45,
             'device': yolo_device,
@@ -104,21 +123,29 @@ def generate_launch_description():
             'markers_topic': '/yolo/person_markers',
             'publish_debug_image': True,
             'publish_markers': True,
+            'class_filter': ['person'],
         }],
     )
 
+
     # YOLO detections to 3D obstacles
     yolo_to_obs = Node(
-        package='ranger_gazebo_experiments', executable='person_detection_to_obstacle_node',
-        name='person_detection_to_obstacle_node', output='screen',
+        package='ranger_gazebo_experiments',
+        executable='person_detection_to_obstacle_node',
+        name='person_detection_to_obstacle_node',
+        output='screen',
+        condition=IfCondition(use_yolo),
         parameters=[{
+            'use_sim_time': True,
             'detections_topic': '/yolo/person_detections',
             'depth_image_topic': '/camera/depth/image_raw',
             'camera_info_topic': '/camera/color/camera_info',
             'obstacles_topic': '/obstacles_yolo_person',
-            'frame_id': 'camera_color_optical_frame',
+            'target_frame': 'odom',
+            'camera_frame': 'camera_color_optical_frame',
         }],
     )
+
 
     # MID360 obstacle clustering
     obstacle_cluster = Node(

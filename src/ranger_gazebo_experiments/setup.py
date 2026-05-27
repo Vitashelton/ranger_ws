@@ -71,6 +71,7 @@ setup(
             'ablation_runner_node = ranger_gazebo_experiments.ablation_runner_node:main',
             'simulated_lidar_obstacle_adapter = ranger_gazebo_experiments.simulated_lidar_obstacle_adapter:main',
             'simulated_depth_obstacle_adapter = ranger_gazebo_experiments.simulated_depth_obstacle_adapter:main',
+            'odom_to_tf_bridge = ranger_gazebo_experiments.odom_to_tf_bridge:main',
         ],
     },
 )

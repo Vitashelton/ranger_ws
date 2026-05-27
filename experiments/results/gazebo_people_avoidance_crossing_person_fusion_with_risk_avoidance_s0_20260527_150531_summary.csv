@@ -1,0 +1,2 @@
+scenario,mode,seed,success,failure_reason,navigation_time_s,path_length_m,collision_count,dangerous_close_count,total_stop_count,git_commit
+crossing_person,fusion_with_risk_avoidance,0,0,stuck,79.42128400300001,0.0,0,0,0,16ba175

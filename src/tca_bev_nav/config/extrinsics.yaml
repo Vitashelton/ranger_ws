@@ -1,0 +1,18 @@
+# Hand-measured extrinsics and HONEST uncertainty estimates.
+# These are weak-calibration initial values, NOT a claim of accurate calibration.
+# All numeric extrinsic values below are PLACEHOLDERS -> TODO measure on the real
+# robot and replace. Do NOT treat them as ground truth.
+/calibration_uncertainty_node:
+  ros__parameters:
+    # camera (D435i color optical frame) w.r.t. base / lidar frame
+    cam_rot_std_deg: 5.0        # TODO measure
+    cam_trans_std_m: 0.05       # TODO measure
+    sigma_rot_deg: 5.0          # confidence scale (reported in paper)
+    sigma_trans_m: 0.05
+    base_inflation_m: 0.15      # TODO tune (robot footprint dependent)
+    max_extra_inflation_m: 0.35
+    publish_period_s: 0.5
+    # --- raw extrinsic guess, used later by the RGB-D projection path ---
+    # TODO: replace with measured values; format [x,y,z, roll,pitch,yaw]
+    cam_to_base_xyzrpy: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    lidar_to_base_xyzrpy: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

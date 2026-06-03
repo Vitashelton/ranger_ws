@@ -1,0 +1,8 @@
+/tca_bev_fusion_node:
+  ros__parameters:
+    range_m: 8.0
+    resolution_m: 0.05
+    update_period_s: 0.1        # target 10 Hz BEV; verify on Jetson (TODO)
+    lidar_topic: "/livox/lidar"
+    lidar_is_custom_msg: true
+    publish_debug_image: true

@@ -91,8 +91,8 @@ $ colcon build
 
 ### Parameters
 
-* can_device (string): **can0**
-* robot_model (string): **ranger**/ranger_mini_v1/ranger_mini_v2/ranger_mini_v3
+* can_device (string): **can1**
+* robot_model (string): **ranger**ranger_mini_v2
 * update_rate (int): **50**
 * base_frame (string): **base_link**
 * odom_frame (string): **odom**

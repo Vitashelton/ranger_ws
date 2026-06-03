@@ -5,20 +5,18 @@ Livox driver config: /home/robot/livox_ws/src/livox_ros_driver2/config/MID360s_c
 Static TF: base_link -> livox_frame (0, 0, 0.35)
 """
 import os
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
     pkg_dir = get_package_share_directory('ranger_nav')
 
-    # --- Static TF: base_link -> livox_frame ---
-    static_tf = Node(
+    lidar_static_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='lidar_static_tf',
@@ -27,16 +25,31 @@ def generate_launch_description():
             '--y', '0.0',
             '--z', '0.70',
             '--roll', '0.0',
-            '--pitch', '0.523599',
+            '--pitch', '0.523599',  # 30度
             '--yaw', '0.0',
             '--frame-id', 'base_link',
             '--child-frame-id', 'livox_frame',
         ],
         output='screen',
     )
+    camera_static_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_static_tf',
+        arguments=[
+            '--x', '0.35',
+            '--y', '0.0',
+            '--z', '0.60',
+            '--roll', '0.0',
+            '--pitch', '0.0',
+            '--yaw', '0.0',
+            '--frame-id', 'base_link',
+            '--child-frame-id', 'camera_link',
+        ],
+        output='screen',
+    )
 
     # --- Livox MID360S driver ---
-    # Config JSON path on the Jetson
     livox_config = os.path.join(
         '/home/robot/livox_ws/src/livox_ros_driver2', 'config', 'MID360s_config.json'
     )
@@ -55,52 +68,36 @@ def generate_launch_description():
             'lvx_file_path': '/home/livox/livox_test.lvx',
             'user_config_path': livox_config,
             'cmdline_input_bd_code': 'livox0000000001',
-
-            # QoS override for PointCloud2
-            'qos_overrides./livox/lidar.publisher.reliability': 'best_effort',
-            'qos_overrides./livox/lidar.publisher.history': 'keep_last',
-            'qos_overrides./livox/lidar.publisher.depth': 5,
         }],
     )
 
-    # --- PointCloud2 -> LaserScan ---
-    pcl_to_scan = Node(
-        package='pointcloud_to_laserscan',
-        executable='pointcloud_to_laserscan_node',
-        name='pointcloud_to_laserscan',
+    # --- D435i camera driver ---
+    d435i_node = Node(
+        package='realsense2_camera',
+        executable='realsense2_camera_node',
+        name='camera',
+        namespace='',
         output='screen',
         parameters=[{
-            'target_frame': 'livox_frame',
-            'transform_tolerance': 0.5,
+            'camera_name': 'camera',
 
-            'min_height': -5.0,
-            'max_height': 5.0,
+            'enable_color': True,
+            'enable_depth': True,
 
-            'angle_min': -3.14159,
-            'angle_max': 3.14159,
-            'angle_increment': 0.0087,
-            'scan_time': 0.1,
+            'align_depth.enable': True,
+            'pointcloud.enable': True,
 
-            'range_min': 0.1,
-            'range_max': 30.0,
+            'enable_gyro': True,
+            'enable_accel': True,
+            'unite_imu_method': 2,
 
-            'use_inf': True,
-            'inf_epsilon': 1.0,
-        }],
-        remappings=[
-            ('cloud_in', '/livox/lidar'),
-            ('scan', '/scan'),
-        ],
-    )
-    # 4. D435i driver
-    d435i = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_dir, 'launch', 'd435i_sensor.launch.py')
-        ),
+            'depth_module.profile': '640x480x30',
+            'rgb_camera.profile': '640x480x30',
+        }]
     )
     return LaunchDescription([
-        static_tf,
-        livox_driver,
-        d435i,
-        pcl_to_scan,
+        lidar_static_tf,   # 雷达TF
+        camera_static_tf,  # 相机TF
+        livox_driver,      # 雷达驱动
+        d435i_node,        # 相机驱动
     ])

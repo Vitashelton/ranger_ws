@@ -1,0 +1,7 @@
+/time_align_node:
+  ros__parameters:
+    tau: 0.10              # s, time-confidence decay constant
+    max_dt: 0.40           # s, hard cutoff -> confidence 0
+    lidar_topic: "/livox/lidar"
+    lidar_is_custom_msg: true   # set false if you publish PointCloud2
+    publish_period_s: 0.2

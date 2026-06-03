@@ -1,0 +1,10 @@
+/safety_supervisor_node:
+  ros__parameters:
+    max_linear_mps: 0.6         # TODO set to a safe indoor cap for your tests
+    max_angular_rps: 0.8
+    max_lin_accel_mps2: 0.5
+    max_ang_accel_rps2: 1.0
+    control_period_s: 0.05      # 20 Hz guard loop
+    cmd_timeout_s: 0.3          # stop if no raw cmd within this window
+    bev_timeout_s: 0.5          # stop if BEV status stale
+    source: "teacher"           # 'teacher' (teleop) or 'policy' (student)

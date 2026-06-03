@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+build/
+install/
+log/
+*.pt
+*.onnx
+*.engine
+*.bag
+*_db3/
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.pdf

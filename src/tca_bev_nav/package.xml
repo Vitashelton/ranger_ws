@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<package format="3">
+  <name>tca_bev_nav</name>
+  <version>0.0.1</version>
+  <description>
+    TCA-BEV: Time- and Calibration-Aware Conservative BEV Fusion for Safe
+    Indoor UGV Navigation. Research package for Ranger Mini 2.0 + Livox MID360
+    + RealSense D435i + Jetson Orin Nano. Does NOT modify the Ranger SDK or the
+    official ranger_ros2 chassis driver.
+  </description>
+  <maintainer email="you@example.com">TODO_your_name</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- Build / test tooling -->
+  <buildtool_depend>ament_python</buildtool_depend>
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <!-- Runtime deps (resolved by rosdep; do not pin versions here) -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+  <exec_depend>message_filters</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>teleop_twist_keyboard</exec_depend>
+  <!-- livox_ros_driver2 provides CustomMsg on /livox/lidar; declared as optional
+       runtime dependency. If you publish PointCloud2 instead, this is not needed. -->
+  <exec_depend>livox_ros_driver2</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

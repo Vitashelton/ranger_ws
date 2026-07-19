@@ -1,0 +1,28 @@
+# RangerWM Safety Supervisor 配置 (bringup 部署用)
+# 值来源: Nav2 nav2_params.yaml + ranger_params.hpp (RangerMiniV2Params)
+rate_hz: 30.0
+cmd_timeout_s: 0.3
+cmd_hard_timeout_s: 0.6
+
+# 加速度限幅 (从 Nav2 确认: acc_lim_x=1.0, acc_lim_theta=2.0)
+a_max_ackermann: 1.0       # m/s^2  (was 0.5; Nav2 DWB acc_lim_x=1.0)
+a_max_spin: 2.0            # rad/s^2 (was 1.0; Nav2 DWB acc_lim_theta=2.0)
+a_brake: 2.0               # m/s^2   (Nav2 DWB dec_lim_x=-1.0; 制动取保守值 2.0)
+
+mode_switch_cooldown_s: 0.4
+
+# 障碍距离 (含 Mid-360 0.5m 盲区, 需要 D435i 近场补盲, NEEDS_PHYSICAL_CONFIRMATION)
+d_hard_m: 0.35             # Nav2 obstacle_min_range=0.3 + 0.05 余量
+d_soft_m: 0.8              # Nav2 inflation_radius=0.55; 取更大值做软降速
+front_sector_deg: 60.0     # 前向扇区角度 (扫描检测范围)
+
+# 速度限幅 (RangerMiniV2Params in ranger_params.hpp)
+v_max: 1.5                 # max_linear_speed
+wz_max: 4.8                # max_angular_speed
+
+# scan 超时
+scan_timeout_s: 0.5
+
+# 控制开关 (launch 时覆盖)
+enabled: true              # false = Nav2 模式, 不发布 /cmd_vel
+mode: "rangerwm"           # rangerwm | nav2

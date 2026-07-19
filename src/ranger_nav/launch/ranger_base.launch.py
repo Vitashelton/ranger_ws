@@ -18,7 +18,7 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory('ranger_nav')
 
     # --- Arguments ---
-    port_name = LaunchConfiguration('port_name', default='can1')
+    port_name = LaunchConfiguration('port_name', default='can0')
     robot_model = LaunchConfiguration('robot_model', default='ranger_mini_v2')
     publish_odom_tf = LaunchConfiguration('publish_odom_tf', default='true')
     update_rate = LaunchConfiguration('update_rate', default='50')
@@ -49,7 +49,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument('port_name', default_value='can1'),
+        DeclareLaunchArgument('port_name', default_value='can0'),
         DeclareLaunchArgument('robot_model', default_value='ranger_mini_v2'),
         DeclareLaunchArgument('publish_odom_tf', default_value='true'),
         DeclareLaunchArgument('update_rate', default_value='50'),

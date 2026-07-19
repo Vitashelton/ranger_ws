@@ -1,0 +1,84 @@
+# RangerWM bringup 参数 —— 所有值从 ranger_nav / ranger_ros2 确认
+# 来源:
+#   ranger_base/include/ranger_base/ranger_params.hpp  (RangerMiniV2Params)
+#   ranger_nav/config/nav2_params.yaml                   (Nav2 tuning)
+#   ranger_nav/launch/ranger_sensors.launch.py           (sensor topics & TF)
+
+# ---- 控制模式 ----
+# mode: "rangerwm" = 世界模型 MPC, "nav2" = Nav2 经典导航, "none" = 纯传感器
+# hardware_up: true = 底盘+传感器已在外部运行, false = 由本 launch 拉起
+
+# ---- TF 外参 (NEEDS_PHYSICAL_CONFIRMATION: 标定后覆盖) ----
+tf:
+  # livox_frame: Livox Mid-360 安装在底盘前上方, 30° 上倾
+  livox:  { x: 0.30, y: 0.0, z: 0.70, roll: 0.0, pitch: 0.523599, yaw: 0.0 }
+  # camera_link: Intel D435i 正前方安装 (pitch=-15° downward tilt TBD)
+  camera: { x: 0.35, y: 0.0, z: 0.60, roll: 0.0, pitch: 0.0,     yaw: 0.0 }
+
+# ---- 传感器 topics (ranger_nav 确认) ----
+sensors:
+  lidar_topic: "/livox/lidar"            # Livox Mid-360 PointCloud2, frame=livox_frame
+  imu_topic: "/livox/imu"                # MID360 内置 IMU
+  scan_topic: "/scan"                    # pointcloud_to_laserscan 输出
+  camera_rgb: "/camera/color/image_raw"  # D435i 640x480@30Hz
+  camera_depth: "/camera/depth/image_rect_raw"
+
+# ---- 底盘参数 (RangerMiniV2Params in ranger_params.hpp) ----
+chassis:
+  max_linear_speed: 1.5                  # m/s
+  max_angular_speed: 4.8                 # rad/s (spin)
+  wheelbase: 0.494                       # m (L_NOMINAL)
+  track: 0.364                           # m
+  min_turn_radius: 0.4764                # m
+  max_steer_ackermann: 0.6981            # rad (机械极限 40deg)
+  delta_ack_twist_max: 0.5448            # rad (Twist 后端 Ackermann 转角上界 31.2deg)
+
+# ---- 障碍检测 (从 Nav2 nav2_params.yaml 确认) ----
+obstacles:
+  source_topic: "/scan"                  # 使用 LaserScan (MVP; 后续可切 /cloud_registered)
+  min_range: 0.3                         # m (Nav2 obstacle_min_range)
+  max_range: 15.0                        # m (Nav2 obstacle_max_range)
+  robot_radius: 0.35                     # m (Nav2 robot_radius)
+  obstacle_radius: 0.10                  # m (per-scan-point inflation)
+  grid_cell_size: 0.15                   # m (scan 降采样 grid)
+  scan_timeout_s: 1.0                    # 超过此时间无 scan -> 空障碍 + warning
+  front_sector_deg: 60.0                 # safety 前向扇区角度
+
+# ---- 目标 ----
+goal:
+  topic: "/goal_pose"                    # geometry_msgs/PoseStamped (RViz / Nav2 共用)
+  frame: "map"                           # 目标所在坐标系
+  default_x: 5.0                         # 无 goal 时的默认目标 x
+  default_y: 0.0                         # 无 goal 时的默认目标 y
+  xy_tolerance: 0.3                      # m (目标到达判定; Nav2 用 0.15)
+
+# ---- MPC 参数 (部署) ----
+mpc:
+  rate_hz: 3.0                           # MPC 重规划频率
+  H: 10                                  # rollout horizon 步数
+  exec_len: 3                            # 每次执行前 N 步
+  dt: 0.1                                # 每步时长 (s)
+  N: 32                                  # 候选数 (含随机)
+  v_grid: [0.2, 0.4, 0.7, 1.0]          # Ackermann 速度档
+  spin_grid: [-1.5, 1.5]                 # Spin 角速度档
+  n_random: 12                           # 随机候选数
+  weights:
+    goal: 1.0
+    collision: 2.5                       # 实机调高到 3.0 后更保守
+    smooth: 0.1
+    uncertainty: 0.0                     # analytic WM 无不确定性, learned WM 时启用
+
+# ---- BEV (stand-in until tca_bev_nav is running) ----
+bev:
+  range_m: 8.0                           # half-extent
+  resolution_m: 0.05                     # cell size -> 160x160 grid
+  publish_topic: "/bev/tensor"           # Float32MultiArray
+  publish_debug_image: false
+
+# ---- 加速度限幅 (从 Nav2 nav2_params.yaml 确认) ----
+# Nav2 DWB: acc_lim_x=1.0, acc_lim_theta=2.0, dec_lim_x=-1.0, dec_lim_theta=-2.0
+safety:
+  a_max_ackermann: 1.0                   # m/s^2 (Nav2 acc_lim_x)
+  a_max_spin: 2.0                        # rad/s^2 (Nav2 acc_lim_theta)
+  a_brake: 2.0                           # m/s^2 (制动减速度)
+  mode_switch_cooldown_s: 0.4            # 模式切换冷却

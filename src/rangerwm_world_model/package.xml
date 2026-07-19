@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>rangerwm_world_model</name>
+  <version>0.1.0</version>
+  <description>Onboard world model inference node.</description>
+  <maintainer email="dev@example.com">rangerwm</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>rangerwm_planning</depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

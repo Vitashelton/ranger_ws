@@ -1,37 +1,30 @@
+#!/usr/bin/python3
 """
 Launch Intel RealSense D435i RGB-D camera for Ranger Mini 2.0.
 
-Publishes:
-  /camera/depth/color/points — Registered depth pointcloud (for obstacles)
-  /camera/color/image_raw     — RGB image (for debugging/visualization)
-  /camera/depth/image_rect_raw — Depth image
+Expected point cloud:
+  /camera/depth/color/points
 
-Static TF: base_link -> camera_link (extrinsics: [TBD] — measure after mounting)
+TF branch:
+  base_link -> camera_link -> camera_*_frame -> camera_*_optical_frame
 """
-import os
 
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    pkg_dir = get_package_share_directory('ranger_nav')
-
-    # --- Static TF: base_link -> camera_link ---
-    # [TBD] values — must be measured after D435i mounting
-    static_tf = Node(
+    # Camera mounting transform. Replace these estimated values after calibration.
+    camera_static_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
-        name='camera_static_tf',
+        name='base_to_camera_link_tf',
         arguments=[
-            '--x', '0.35',        # [TBD] forward offset
-            '--y', '0.0',         # centered
-            '--z', '0.60',        # [TBD] height above ground
+            '--x', '0.35',
+            '--y', '0.0',
+            '--z', '0.60',
             '--roll', '0.0',
-            '--pitch', '0.0', # [TBD] -15° downward tilt
+            '--pitch', '0.0',
             '--yaw', '0.0',
             '--frame-id', 'base_link',
             '--child-frame-id', 'camera_link',
@@ -39,7 +32,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # --- D435i camera driver ---
     d435i_node = Node(
         package='realsense2_camera',
         executable='realsense2_camera_node',
@@ -49,22 +41,43 @@ def generate_launch_description():
         parameters=[{
             'camera_name': 'camera',
 
+            # Streams
             'enable_color': True,
             'enable_depth': True,
+            'enable_infra1': False,
+            'enable_infra2': False,
 
+            'rgb_camera.color_profile': '640x480x15',
+            'depth_module.depth_profile': '640x480x15',
+
+            # Align depth to color
             'align_depth.enable': True,
+
+            # Point cloud
             'pointcloud.enable': True,
+            'pointcloud.ordered_pc': False,
+            'pointcloud.allow_no_texture_points': True,
 
-            'enable_gyro': True,
-            'enable_accel': True,
-            'unite_imu_method': 2,
+            # D435i IMU is not used for now
+            'enable_gyro': False,
+            'enable_accel': False,
 
-            'depth_module.profile': '640x480x30',
-            'rgb_camera.profile': '640x480x30',
-        }]
+            # The RealSense driver publishes its internal camera TFs.
+            # A zero rate keeps fixed transforms on /tf_static.
+            'publish_tf': True,
+            'tf_publish_rate': 0.0,
+
+            # base_frame_id is a suffix: camera_name + '_' + base_frame_id.
+            # Therefore 'link' produces the required root frame camera_link.
+            'base_frame_id': 'link',
+            'color_frame_id': 'camera_color_frame',
+            'color_optical_frame_id': 'camera_color_optical_frame',
+            'depth_frame_id': 'camera_depth_frame',
+            'depth_optical_frame_id': 'camera_depth_optical_frame',
+        }],
     )
 
     return LaunchDescription([
-        static_tf,
+        camera_static_tf,
         d435i_node,
     ])

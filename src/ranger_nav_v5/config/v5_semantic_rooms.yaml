@@ -1,0 +1,21 @@
+semantic_memory_node:
+  ros__parameters:
+    target_room: "906"
+    target_frame: odom
+    publish_hz: 5.0
+
+    # Initial semantic memory for corridor/lab tests.
+    # These are fallback targets before YOLO/localizer is connected.
+    rooms_json: >
+      {
+        "902": {"label":"Room 902", "door_material":"wood",  "door_front":[2.0, -1.2, 0.0]},
+        "904": {"label":"Room 904", "door_material":"wood",  "door_front":[4.0, -1.2, 0.0]},
+        "906": {"label":"Room 906", "door_material":"glass", "door_front":[6.0,  1.2, 0.0]},
+        "908": {"label":"Room 908", "door_material":"glass", "door_front":[8.0,  1.2, 0.0]}
+      }
+
+semantic_detector_stub:
+  ros__parameters:
+    target_room: "906"
+    publish_hz: 1.0
+    target_frame: odom

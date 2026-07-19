@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>rangerwm_mpc</name>
+  <version>0.1.0</version>
+  <description>World-model-guided MPC reranking node.</description>
+  <maintainer email="dev@example.com">rangerwm</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>rangerwm_msgs</depend>
+  <depend>rangerwm_planning</depend>
+  <depend>rangerwm_kinematics</depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

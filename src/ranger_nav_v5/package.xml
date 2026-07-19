@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ranger_nav_v5</name>
+  <version>0.5.0</version>
+  <description>Real-sensor-ready RangerMini 2.0 semantic shared-control layer for ROS 2 Humble.</description>
+  <maintainer email="zbx@example.com">zbx</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-matplotlib</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

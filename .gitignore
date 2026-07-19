@@ -24,6 +24,7 @@ Makefile
 *.mcap
 *.active
 rosbag2_*/
+terrain_flat_02ms_01/
 
 # Large sensor data
 *.pcd
@@ -65,3 +66,6 @@ env/
 *.secret
 *.tex
 *.png
+
+# Broken symlinks on this machine
+src/\*

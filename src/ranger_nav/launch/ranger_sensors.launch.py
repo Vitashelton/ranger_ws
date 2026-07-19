@@ -1,24 +1,26 @@
 """
-Launch Ranger Mini 2.0 sensors: Livox MID360S driver + pointcloud-to-LaserScan + static TF.
+Launch only the sensors needed by TCA-BEV:
+  - base_link -> livox_frame static TF
+  - Livox MID360S driver publishing /livox/lidar as CustomMsg
+  - D435i driver and base_link -> camera_link static TF
 
-Livox driver config: /home/robot/livox_ws/src/livox_ros_driver2/config/MID360s_config.json
-Static TF: base_link -> livox_frame (0, 0, 0.35)
+No /scan conversion is launched here. TCA-BEV uses the 3D MID360S data directly.
 """
+
 import os
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
     pkg_dir = get_package_share_directory('ranger_nav')
 
-    # --- Static TF: base_link -> livox_frame ---
-    static_tf = Node(
+    # LiDAR mounting transform. Keep only one publisher for this transform.
+    lidar_static_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='lidar_static_tf',
@@ -35,72 +37,39 @@ def generate_launch_description():
         output='screen',
     )
 
-    # --- Livox MID360S driver ---
-    # Config JSON path on the Jetson
     livox_config = os.path.join(
         '/home/robot/livox_ws/src/livox_ros_driver2', 'config', 'MID360s_config.json'
     )
+
     livox_driver = Node(
         package='livox_ros_driver2',
         executable='livox_ros_driver2_node',
         name='livox_lidar_publisher',
         output='screen',
         parameters=[{
-            'xfer_format': 0,
+            'xfer_format': 1,
             'multi_topic': 0,
             'data_src': 0,
             'publish_freq': 10.0,
+
+            # 0 keeps livox_ros_driver2/msg/CustomMsg, which your current system publishes.
+            # TCA-BEV receives converted PointCloud2 from mid360s_adapter, not directly here.
             'output_data_type': 0,
             'frame_id': 'livox_frame',
             'lvx_file_path': '/home/livox/livox_test.lvx',
             'user_config_path': livox_config,
             'cmdline_input_bd_code': 'livox0000000001',
-
-            # QoS override for PointCloud2
-            'qos_overrides./livox/lidar.publisher.reliability': 'best_effort',
-            'qos_overrides./livox/lidar.publisher.history': 'keep_last',
-            'qos_overrides./livox/lidar.publisher.depth': 5,
         }],
     )
 
-    # --- PointCloud2 -> LaserScan ---
-    pcl_to_scan = Node(
-        package='pointcloud_to_laserscan',
-        executable='pointcloud_to_laserscan_node',
-        name='pointcloud_to_laserscan',
-        output='screen',
-        parameters=[{
-            'target_frame': 'livox_frame',
-            'transform_tolerance': 0.5,
-
-            'min_height': -5.0,
-            'max_height': 5.0,
-
-            'angle_min': -3.14159,
-            'angle_max': 3.14159,
-            'angle_increment': 0.0087,
-            'scan_time': 0.1,
-
-            'range_min': 0.1,
-            'range_max': 30.0,
-
-            'use_inf': True,
-            'inf_epsilon': 1.0,
-        }],
-        remappings=[
-            ('cloud_in', '/livox/lidar'),
-            ('scan', '/scan'),
-        ],
-    )
-    # 4. D435i driver
     d435i = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_dir, 'launch', 'd435i_sensor.launch.py')
         ),
     )
+
     return LaunchDescription([
-        static_tf,
+        lidar_static_tf,
         livox_driver,
         d435i,
-        pcl_to_scan,
     ])

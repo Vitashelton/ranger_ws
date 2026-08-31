@@ -1,0 +1,9 @@
+doorway_traversability:
+  ros__parameters:
+    door_distance: 2.0
+    ground_truth: UNSET
+    lidar_topic: /livox/lidar
+    depth_topic: /camera/aligned_depth_to_color/image_raw
+    max_receipt_age: 0.50
+    max_pair_skew: 0.25
+    publish_rate: 5.0

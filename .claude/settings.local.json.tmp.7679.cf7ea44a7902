@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/zbx/TurtleBot3-semantic-navigation/**)",
+      "Bash(colcon build *)",
+      "Bash(pdflatex -interaction=nonstopmode -draftmode risk_aware_fusion_paper.tex)",
+      "WebSearch",
+      "Bash(dpkg -l)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh repo *)",
+      "Bash(curl -sS \"https://raw.githubusercontent.com/Rhymer-Lcy/FAST-LIVO2-ROS2-MID360-Fisheye/main/README.md\")",
+      "Bash(curl -sS \"https://raw.githubusercontent.com/VIS4ROB-lab/FAST-LIVO2-ROS2/main/README.md\")",
+      "Bash(curl -sS \"https://api.github.com/repos/Rhymer-Lcy/FAST-LIVO2-ROS2-MID360-Fisheye/git/trees/main?recursive=1\")",
+      "Bash(curl -sS \"https://api.github.com/repos/VIS4ROB-lab/FAST-LIVO2-ROS2/git/trees/main?recursive=1\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(t['path']\\) for t in d['tree']]\")",
+      "Bash(curl -sSL \"https://api.github.com/repos/VIS4ROB-lab/FAST-LIVO2-ROS2/git/trees/main?recursive=1\")",
+      "Bash(curl *)",
+      "Bash(apt-cache search *)",
+      "Bash(sudo apt-get *)",
+      "Bash(git clone *7)",
+      "Bash(git clone *)",
+      "Bash(python3 -c \"import yaml; yaml.safe_load\\(open\\('/home/zbx/ranger_ws/src/fast_livo2/config/mid360_d435i.yaml'\\)\\); print\\('mid360_d435i.yaml: OK'\\)\")",
+      "Bash(python3 -c \"import yaml; yaml.safe_load\\(open\\('/home/zbx/ranger_ws/src/fast_livo2/config/camera_d435i.yaml'\\)\\); print\\('camera_d435i.yaml: OK'\\)\")",
+      "Bash(git submodule *)",
+      "Bash(dpkg -L ros-humble-sophus)",
+      "Bash(ros2 topic *)",
+      "Bash(ros2 service *)",
+      "Bash(ros2 interface *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)"
+    ]
+  }
+}

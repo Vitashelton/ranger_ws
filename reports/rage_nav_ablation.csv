@@ -1,0 +1,49 @@
+case_id,mode,expected_decision,should_execute,expected_wrong_execution,expected_clarification,expected_recovery,decision,wrong_execution,task_success,ambiguity_handling_correct,stale_state_block,low_confidence_block,clarification,recovery_success,unnecessary_rejection,latency_ms,risk_terms
+clear_target_low_risk,no_gate,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.001,{}
+clear_target_low_risk,verifier_only,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.0,{}
+clear_target_low_risk,grounder_only,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.0,{}
+clear_target_low_risk,ours,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.028,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+ambiguous_two_labs,no_gate,ask_user,0,0,1,0,execute,1,0,0,0,0,0,0,0,0.0,{}
+ambiguous_two_labs,verifier_only,ask_user,0,0,1,0,execute,1,0,0,0,0,0,0,0,0.0,{}
+ambiguous_two_labs,grounder_only,ask_user,0,0,1,0,execute,1,0,0,0,0,0,0,0,0.0,{}
+ambiguous_two_labs,ours,ask_user,0,0,1,0,ask_user,0,1,1,0,0,1,0,0,0.011,"{'ambiguity_score': 0.5, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 1.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 1.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+unresolved_target,no_gate,ask_user,0,0,1,0,ask_user,0,1,0,0,0,1,0,0,0.0,{}
+unresolved_target,verifier_only,ask_user,0,0,1,0,ask_user,0,1,0,0,0,1,0,0,0.0,{}
+unresolved_target,grounder_only,ask_user,0,0,1,0,ask_user,0,1,0,0,0,1,0,0,0.0,{}
+unresolved_target,ours,ask_user,0,0,1,0,ask_user,0,1,0,0,0,1,0,0,0.009,"{'ambiguity_score': 1.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 1.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 1.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+unreachable_target,no_gate,recover,0,0,0,1,execute,1,0,1,0,0,0,0,0,0.0,{}
+unreachable_target,verifier_only,recover,0,0,0,1,execute,1,0,1,0,0,0,0,0,0.0,{}
+unreachable_target,grounder_only,recover,0,0,0,1,execute,1,0,1,0,0,0,0,0,0.0,{}
+unreachable_target,ours,recover,0,0,0,1,recover,0,1,1,0,0,0,1,0,0.01,"{'ambiguity_score': 0.0, 'reachability_risk': 1.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+stale_semantic_state,no_gate,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+stale_semantic_state,verifier_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+stale_semantic_state,grounder_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+stale_semantic_state,ours,ask_user,0,0,1,0,ask_user,0,1,0,1,0,1,0,0,0.01,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.9, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+stale_robot_state,no_gate,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+stale_robot_state,verifier_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+stale_robot_state,grounder_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+stale_robot_state,ours,ask_user,0,0,1,0,ask_user,0,1,0,1,0,1,0,0,0.009,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.9, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+no_confirmation_target,no_gate,verify_first,0,0,0,0,execute,0,0,1,0,0,0,0,0,0.0,{}
+no_confirmation_target,verifier_only,verify_first,0,0,0,0,execute,0,0,1,0,0,0,0,0,0.0,{}
+no_confirmation_target,grounder_only,verify_first,0,0,0,0,execute,0,0,1,0,0,0,0,0,0.0,{}
+no_confirmation_target,ours,verify_first,0,0,0,0,verify_first,0,1,1,0,0,0,0,0,0.01,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.8, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+low_semantic_confidence,no_gate,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+low_semantic_confidence,verifier_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+low_semantic_confidence,grounder_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+low_semantic_confidence,ours,ask_user,0,0,1,0,ask_user,0,1,0,0,1,1,0,0,0.009,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.8, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+high_history_failure,no_gate,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+high_history_failure,verifier_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+high_history_failure,grounder_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+high_history_failure,ours,ask_user,0,0,1,0,verify_first,0,0,1,0,0,0,0,0,0.009,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.9, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"
+hallucinated_tool_mismatch,no_gate,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+hallucinated_tool_mismatch,verifier_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+hallucinated_tool_mismatch,grounder_only,ask_user,0,0,1,0,execute,1,0,1,0,0,0,0,0,0.0,{}
+hallucinated_tool_mismatch,ours,ask_user,0,0,1,0,ask_user,0,1,0,0,0,1,0,0,0.009,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 1.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 1.0}"
+blocked_but_reachable_old_map,no_gate,ask_user,0,0,1,0,execute,0,0,1,0,0,0,0,0,0.0,{}
+blocked_but_reachable_old_map,verifier_only,ask_user,0,0,1,0,execute,0,0,1,0,0,0,0,0,0.0,{}
+blocked_but_reachable_old_map,grounder_only,ask_user,0,0,1,0,execute,0,0,1,0,0,0,0,0,0.0,{}
+blocked_but_reachable_old_map,ours,ask_user,0,0,1,0,ask_user,0,1,0,0,0,1,0,0,0.009,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.8, 'hallucination_mismatch_risk': 0.0}"
+normal_case_with_budget_low,no_gate,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.0,{}
+normal_case_with_budget_low,verifier_only,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.0,{}
+normal_case_with_budget_low,grounder_only,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.0,{}
+normal_case_with_budget_low,ours,execute,1,0,0,0,execute,0,1,1,0,0,0,0,0,0.01,"{'ambiguity_score': 0.0, 'reachability_risk': 0.0, 'confirmation_risk': 0.0, 'hallucination_risk': 0.0, 'task_criticality': 0.3, 'history_failure_risk': 0.0, 'semantic_confidence_risk': 0.0, 'freshness_risk': 0.0, 'budget_risk': 0.0, 'hallucination_mismatch_risk': 0.0}"

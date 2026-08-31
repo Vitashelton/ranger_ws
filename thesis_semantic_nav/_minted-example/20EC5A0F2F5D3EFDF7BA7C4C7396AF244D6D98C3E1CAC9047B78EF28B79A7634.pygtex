@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 完整bringup（不含semantic stub，使用真实YOLO检测器）}
+ros2 launch ranger\PYGZus{}nav\PYGZus{}v5 ranger\PYGZus{}realtime\PYGZus{}bringup.launch.py \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}base:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}mid360:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}d435i:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}semantic:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}semantic\PYGZus{}stub:\PYG{o}{=}\PYG{n+nb}{false} \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}shared\PYGZus{}control:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}logger:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  enable\PYGZus{}drive:\PYG{o}{=}\PYG{n+nb}{false} \PYG{l+s+se}{\PYGZbs{}}
+  target\PYGZus{}room:\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}906\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{} 传感器健康检查}
+ros2 launch ranger\PYGZus{}nav\PYGZus{}v5 sensor\PYGZus{}health\PYGZus{}check.launch.py
+
+\PYG{c+c1}{\PYGZsh{} 确认各传感器正常后，使能底盘驱动}
+ros2 service call /enable\PYGZus{}drive std\PYGZus{}srvs/srv/SetBool \PYG{l+s+s2}{\PYGZdq{}\PYGZob{}data: true\PYGZcb{}\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{} 发送语义指令}
+ros2 topic pub \PYGZhy{}\PYGZhy{}once /user\PYGZus{}command std\PYGZus{}msgs/String \PYG{l+s+s1}{\PYGZsq{}\PYGZob{}data: \PYGZdq{}go to 906 glass door\PYGZdq{}\PYGZcb{}\PYGZsq{}}
+
+\PYG{c+c1}{\PYGZsh{} 查看调试话题}
+ros2 topic \PYG{n+nb}{echo} /semantic\PYGZus{}target\PYGZus{}pose
+ros2 topic \PYG{n+nb}{echo} /intervention\PYGZus{}score
+ros2 topic \PYG{n+nb}{echo} /min\PYGZus{}distance
+\end{Verbatim}

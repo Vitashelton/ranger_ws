@@ -1,0 +1,27 @@
+# Build
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# System
+.DS_Store
+*.swp
+*.swo
+*~
+
+# ROS
+*.bag
+
+# Claude Code
+.claude/

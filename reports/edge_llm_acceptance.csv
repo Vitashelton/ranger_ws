@@ -1,0 +1,79 @@
+index,command,raw_response,parsed_json,verifier_result,fail_reason,latency_ms
+1,去充电桩,"{
+  ""task"": [
+    {
+      ""action"": ""navigate_to"",
+      ""target"": ""room_203"",
+      ""condition"": """"
+    }
+  ]
+}","{""task"": [{""action"": ""navigate_to"", ""target"": ""room_203"", ""condition"": """"}]}",1,,874.3
+2,前往实验室门口,"{""task"":[{""action"":""navigate_to"",""target"":""lab_door"",""condition"":""没看到门牌""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""lab_door"", ""condition"": ""没看到门牌""}]}",1,,5866.0
+3,到大厅后等待十秒,"{""task"":[{""action"":""wait"",""target"":""hallway"",""condition"":""10 seconds""}]}","{""task"": [{""action"": ""wait"", ""target"": ""hallway"", ""condition"": ""10 seconds""}]}",1,,2231.1
+4,去会议室，确认看到会议室标志,"{""task"":[{""action"":""navigate_to"",""target"":""meeting_room"",""condition"":""has_seen_meeting_room_sign""},{""action"":""verify_target"",""target"":""meeting_room""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""meeting_room"", ""condition"": ""has_seen_meeting_room_sign""}, {""action"": ""verify_target"", ""target"": ""meeting_room""}]}",0,task[1] missing fields: ['condition']; task[1] condition must be a string,770.7
+5,搜索走廊尽头的出口,"{""task"":[{""action"":""navigate_to"",""target"":""corridor尽头"",""condition"":""没看到门牌""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""corridor尽头"", ""condition"": ""没看到门牌""}]}",0,task[0] target must be normalized ASCII: 'corridor尽头',538.8
+6,先去大厅，再去实验室,"{
+  ""task"": [
+    {
+      ""action"": ""navigate_to"",
+      ""target"": ""hallway"",
+      ""condition"": ""true""
+    },
+    {
+      ""action"": ""navigate_to"",
+      ""target"": ""lab"",
+      ""condition"": ""true""
+    }
+  ]
+}","{""task"": [{""action"": ""navigate_to"", ""target"": ""hallway"", ""condition"": ""true""}, {""action"": ""navigate_to"", ""target"": ""lab"", ""condition"": ""true""}]}",1,,1360.8
+7,前往仓库并确认到达,"{""task"":[{""action"":""navigate_to"",""target"":""warehouse"",""condition"":""true""},{""action"":""verify_target"",""target"":""warehouse""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""warehouse"", ""condition"": ""true""}, {""action"": ""verify_target"", ""target"": ""warehouse""}]}",0,task[1] missing fields: ['condition']; task[1] condition must be a string,620.4
+8,去充电桩，如果没有看到就搜索,"{""task"":[{""action"":""navigate_to"",""target"":""充电桩"",""condition"":""没看到门牌""},{""action"":""verify_target"",""target"":""充电桩""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""充电桩"", ""condition"": ""没看到门牌""}, {""action"": ""verify_target"", ""target"": ""充电桩""}]}",0,task[0] target must be normalized ASCII: '充电桩'; task[1] missing fields: ['condition']; task[1] target must be normalized ASCII: '充电桩'; task[1] condition must be a string,652.5
+9,到电梯口等待五秒,"{
+  ""task"": [
+    {
+      ""action"": ""wait"",
+      ""target"": ""elevator entrance"",
+      ""condition"": ""5 seconds""
+    }
+  ]
+}","{""task"": [{""action"": ""wait"", ""target"": ""elevator entrance"", ""condition"": ""5 seconds""}]}",1,,846.9
+10,寻找一号房间,"{""task"":[{""action"":""navigate_to"",""target"":""room_1#1"",""condition"":""not (seen_door or not room_exists)""},{""action"":""verify_target"",""target"":""room_1#1""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""room_1#1"", ""condition"": ""not (seen_door or not room_exists)""}, {""action"": ""verify_target"", ""target"": ""room_1#1""}]}",0,task[1] missing fields: ['condition']; task[1] condition must be a string,920.3
+11,去前台并询问是否可以继续,"{
+  ""task"": [
+    {
+      ""action"": ""ask_user"",
+      ""target"": """",
+      ""condition"": ""没看到门牌""
+    }
+  ]
+}","{""task"": [{""action"": ""ask_user"", ""target"": """", ""condition"": ""没看到门牌""}]}",0,task[0] target must be non-empty for ask_user,845.0
+12,巡视大厅,"{""task"":[{""action"":""navigate_to"",""target"":""hallway"",""condition"":""no_room_signs""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""hallway"", ""condition"": ""no_room_signs""}]}",1,,533.3
+13,前往实验室，停留三十秒,"{""task"":[{""action"":""navigate_to"",""target"":""lab_door"",""condition"":""30s""},{""action"":""wait"",""target"":""lab_door""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""lab_door"", ""condition"": ""30s""}, {""action"": ""wait"", ""target"": ""lab_door""}]}",0,task[1] missing fields: ['condition']; task[1] condition must be a string,682.7
+14,去东侧走廊搜索消防出口,"{""task"":[{""action"":""navigate_to"",""target"":""corridor east"",""condition"":""has_fire_exit""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""corridor east"", ""condition"": ""has_fire_exit""}]}",1,,517.6
+15,先确认当前位置，再去会议室,"{""task"":[{""action"":""navigate_to"",""target"":""conference_room"",""condition"":""not(navigate_to(room_203))""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""conference_room"", ""condition"": ""not(navigate_to(room_203))""}]}",1,,621.8
+16,到仓库门口并确认仓库标志,"{""task"":[{""action"":""navigate_to"",""target"":""warehouse_door"",""condition"":""seen_warehouse_sign""},{""action"":""verify_target"",""target"":""warehouse""}]}","{""task"": [{""action"": ""navigate_to"", ""target"": ""warehouse_door"", ""condition"": ""seen_warehouse_sign""}, {""action"": ""verify_target"", ""target"": ""warehouse""}]}",0,task[1] missing fields: ['condition']; task[1] condition must be a string,670.7
+17,去大厅找人,"{
+    ""task"": [
+        {
+            ""action"": ""ask_user"",
+            ""target"": ""hall"",
+            ""condition"": """"
+        }
+    ]
+}","{""task"": [{""action"": ""ask_user"", ""target"": ""hall"", ""condition"": """"}]}",1,,730.3
+18,如果定位丢失，请询问我下一步怎么办,"{""task"":[{""action"":""ask_user"",""target"":""找不到门牌，问一下应该怎么做？"",""condition"":""无法找到目标位置""}]}","{""task"": [{""action"": ""ask_user"", ""target"": ""找不到门牌，问一下应该怎么做？"", ""condition"": ""无法找到目标位置""}]}",0,task[0] target must be normalized ASCII: '找不到门牌，问一下应该怎么做？',628.4
+19,到充电桩后等待一分钟,"{""task"":[{""action"":""wait"",""target"":""after_charging_parking_lot"",""condition"":""true""}]}","{""task"": [{""action"": ""wait"", ""target"": ""after_charging_parking_lot"", ""condition"": ""true""}]}",1,,502.4
+20,搜索会议室，找到后确认,"{
+  ""task"": [
+    {
+      ""action"": ""navigate_to"",
+      ""target"": ""meeting_room"",
+      ""condition"": ""found_meeting_room""
+    },
+    {
+      ""action"": ""verify_target"",
+      ""target"": ""meeting_room"",
+      ""condition"": ""confirmed_found_meeting_room""
+    }
+  ]
+}","{""task"": [{""action"": ""navigate_to"", ""target"": ""meeting_room"", ""condition"": ""found_meeting_room""}, {""action"": ""verify_target"", ""target"": ""meeting_room"", ""condition"": ""confirmed_found_meeting_room""}]}",1,,1483.9

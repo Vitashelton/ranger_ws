@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-source /opt/ros/humble/setup.bash
-source ~/ranger_ws/install/setup.bash
+source /home/zbx/ros2_comm_pc.sh
+source /home/zbx/ranger_ws/install/setup.bash
 
-export ROS_DOMAIN_ID=0
-export ROS_LOCALHOST_ONLY=0
-
-ros2 launch ranger_nav ubuntu_compute.launch.py
+echo "默认全局导航已暂停：二维 /scan 重定位方案已撤销。"
+echo "请先使用 ./lab_map.sh start 生成3D PCD，等待三维定位器接入。"
+exit 1

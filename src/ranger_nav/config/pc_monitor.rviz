@@ -1,0 +1,208 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Enabled: true
+      Name: Grid
+      Plane: XY
+      Cell Size: 1
+      Alpha: 0.45
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Name: TF
+      Marker Scale: 0.5
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: FAST-LIO Accumulated 3D Map
+      Topic:
+        Value: /Laser_map
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 1
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Color Transformer: Intensity
+      Position Transformer: XYZ
+      Queue Size: 2
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: FAST-LIO Registered Cloud
+      Topic:
+        Value: /cloud_registered
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 2
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Color Transformer: Intensity
+      Position Transformer: XYZ
+      Queue Size: 5
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: Nav Obstacle Cloud
+      Topic:
+        Value: /nav/points
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 2
+      Style: Points
+      Size (Pixels): 2
+      Size (m): 0.03
+      Color Transformer: FlatColor
+      Color: 255; 85; 0
+      Position Transformer: XYZ
+      Queue Size: 5
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Name: FAST-LIO Trajectory
+      Topic:
+        Value: /path
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 5
+      Line Style: Lines
+      Line Width: 0.04
+      Color: 25; 255; 0
+      Buffer Length: 1
+    - Class: rviz_default_plugins/Path
+      Enabled: true
+      Name: Nav2 Plan
+      Topic:
+        Value: /plan
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 5
+      Line Style: Lines
+      Line Width: 0.06
+      Color: 255; 200; 0
+      Buffer Length: 1
+    - Class: rviz_default_plugins/Odometry
+      Enabled: true
+      Name: FAST-LIO Base Pose
+      Topic:
+        Value: /lio/base_odom
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 5
+      Keep: 50
+      Position Tolerance: 0.05
+      Angle Tolerance: 0.05
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: D435i RGB
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 1
+      Median window: 5
+      Topic:
+        Value: /camera/color/image_raw
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 2
+    - Class: rviz_default_plugins/Image
+      Enabled: false
+      Name: D435i Aligned Depth
+      Normalize Range: true
+      Min Value: 0
+      Max Value: 5000
+      Median window: 5
+      Topic:
+        Value: /camera/aligned_depth_to_color/image_raw
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 2
+    - Class: rviz_default_plugins/Map
+      Enabled: false
+      Name: Persistent Lab Map
+      Topic:
+        Value: /map
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+      Alpha: 0.75
+      Color Scheme: map
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: Global Costmap
+      Topic:
+        Value: /global_costmap/costmap
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+      Alpha: 0.35
+      Color Scheme: costmap
+    - Class: rviz_default_plugins/Map
+      Enabled: true
+      Name: Local Costmap
+      Topic:
+        Value: /local_costmap/costmap
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+      Alpha: 0.45
+      Color Scheme: costmap
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Rooms and Elevator
+      Topic:
+        Value: /lab_waypoints/markers
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+    - Class: rviz_default_plugins/RobotModel
+      Enabled: true
+      Name: Ranger
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Reliability Policy: Reliable
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Depth: 1
+  Enabled: true
+  Global Options:
+    Background Color: 35; 35; 35
+    Fixed Frame: odom
+    Frame Rate: 20
+  Name: Ranger Lab Demo
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+    - Class: rviz_default_plugins/SetGoal
+      Topic: /goal_pose
+    - Class: rviz_default_plugins/SetInitialPose
+      Topic: /initialpose
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Top Down
+      Scale: 20
+      Target Frame: <Fixed Frame>
+Window Geometry:
+  Height: 900
+  Width: 1450

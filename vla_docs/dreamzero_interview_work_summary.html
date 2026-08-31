@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DreamZero AgiBot 真机复现与面试展示材料</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --paper: #ffffff;
+      --ink: #17202a;
+      --muted: #627084;
+      --line: #d9dee8;
+      --blue: #2457a6;
+      --green: #18745a;
+      --red: #ad3e37;
+      --gold: #8a6500;
+      --code: #101828;
+      --soft-blue: #eaf1fb;
+      --soft-green: #eaf7f1;
+      --soft-red: #fbefed;
+      --soft-gold: #fff5d9;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.65;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 24px 64px;
+    }
+
+    header {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.25;
+      margin: 0 0 14px;
+    }
+
+    h1 {
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-top: 4px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-top: 22px;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 900px;
+      font-size: 15px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      color: #354154;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      margin-top: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+
+    .callout {
+      border-left: 4px solid var(--blue);
+      background: var(--soft-blue);
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 12px 0 16px;
+    }
+
+    .callout.green { border-left-color: var(--green); background: var(--soft-green); }
+    .callout.red { border-left-color: var(--red); background: var(--soft-red); }
+    .callout.gold { border-left-color: var(--gold); background: var(--soft-gold); }
+
+    ul, ol { margin: 8px 0 0 22px; padding: 0; }
+    li { margin: 5px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2f7;
+      text-align: left;
+      font-weight: 650;
+    }
+
+    code {
+      background: #eef2f7;
+      color: var(--code);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+      margin: 14px 0;
+    }
+
+    .node {
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      border-radius: 8px;
+      padding: 13px;
+      min-height: 88px;
+    }
+
+    .arrow {
+      color: var(--muted);
+      align-self: center;
+      font-size: 22px;
+      padding: 0 2px;
+    }
+
+    .tag {
+      display: inline-block;
+      min-width: 52px;
+      text-align: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-right: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .tag.green { background: var(--green); }
+    .tag.red { background: var(--red); }
+    .tag.gold { background: var(--gold); }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .kpi {
+      font-size: 26px;
+      font-weight: 750;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .kbd {
+      border: 1px solid #c8ceda;
+      background: #f7f8fb;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 0 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    @media (max-width: 840px) {
+      .grid.two, .grid.three, .flow {
+        grid-template-columns: 1fr;
+      }
+      .arrow { display: none; }
+      header, section { padding: 18px; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>DreamZero AgiBot 真机复现与面试展示材料</h1>
+      <p class="subtitle">
+        目标：把论文中的 World Action Model 复现到 AgiBot/G1 真机闭环中。在官方没有直接可用的 AgiBot server/client 真机工程的前提下，补齐模型服务、WebSocket 协议、GDK 客户端、动作执行、日志诊断和论文一致性对齐。
+      </p>
+      <div class="meta">
+        <span class="pill">论文：World Action Models are Zero-shot Policies</span>
+        <span class="pill">模型：Wan2.1-I2V-14B + Flow Matching action head</span>
+        <span class="pill">机器人：AgiBot G1 / 双臂移动操作</span>
+        <span class="pill">核心闭环：3 视角 + proprio + 48-step action chunk</span>
+        <span class="pill">输出文件：docs/dreamzero_interview_work_summary.html</span>
+      </div>
+    </header>
+
+    <section>
+      <h2>面试开场版本</h2>
+      <div class="callout green">
+        我做的不是简单跑一个 checkpoint，而是把 DreamZero 论文里的 WAM 推理机制落到 AgiBot 真机闭环：从三路相机和 GDK 状态采集开始，构造 AgiBot modality schema，经 WebSocket server 进入 DreamZero action head，再把 48 行、22 维动作按 30Hz、row-synced 的方式下发给双臂、夹爪、腰部和底盘，并补齐缓存重置、视频保存、动作日志、推理步数对齐和安全限幅。最终形成了可启动、可调试、可复现实验的 server/client 体系。
+      </div>
+      <p>
+        面试中可以把工作分成三层讲：第一层是理解论文机制，第二层是补齐缺失工程，第三层是通过日志和真机问题反推系统瓶颈。
+      </p>
+    </section>
+
+    <section>
+      <h2>论文技术理解</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>DreamZero 解决什么问题</h3>
+          <p>
+            传统 VLA 更擅长语义泛化，但对新环境中的新物理动作泛化较弱。DreamZero 把视频扩散模型改造成 World Action Model：同一个 DiT 同时预测未来视频和动作，让动作学习从纯状态-动作拟合，变成“生成视觉未来 + 反推动作”的联合建模。
+          </p>
+          <p class="small">对应论文：Abstract、Section 1、Section 3.1。</p>
+        </div>
+        <div class="card">
+          <h3>模型结构</h3>
+          <p>
+            输入包含视觉上下文、语言指令和 proprioceptive state。视频经 VAE 变成 latent，语言经 text encoder，动作和状态进入 action/state register。DiT 用 flow matching 同时 denoise video latent 和 action latent，最后由 action decoder 输出连续动作。
+          </p>
+          <p class="small">对应代码：<a href="../groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py">wan_flow_matching_action_tf.py</a>。</p>
+        </div>
+        <div class="card">
+          <h3>为什么是 autoregressive</h3>
+          <p>
+            论文强调 autoregressive WAM 可以保持原始 FPS，不需要像 bidirectional 视频模型那样做严重 subsampling，因此更容易保持 video-action-language 对齐。推理时通过 KV cache 复用历史，执行完一个 chunk 后用真实观测替换预测视频，减轻自回归误差累积。
+          </p>
+          <p class="small">对应论文：Section 3.1、Appendix B/C、Figure 14。</p>
+        </div>
+        <div class="card">
+          <h3>实时控制约束</h3>
+          <p>
+            AgiBot 设置是 video 5FPS、action 30Hz、action horizon 48，也就是每个 chunk 覆盖 1.6 秒。论文目标是推理和执行异步重叠，理想情况下推理必须在当前 chunk 过期前完成，最终通过 CFG parallelism、DiT caching、torch.compile、kernel/scheduler 优化、Flash 等方式追求 7Hz。
+          </p>
+          <p class="small">对应论文：Section 3.2、Appendix C/D。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>我的工程闭环</h2>
+      <div class="flow">
+        <div class="node">
+          <strong>真机采集</strong>
+          <p>GDK 读取 head、hand_left、hand_right 三路相机；读取双臂、夹爪、头、腰状态。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>协议适配</strong>
+          <p>构造 AgiBot observation key，支持 raw/JPEG、1 帧或多帧 history、session_id。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>DreamZero Server</strong>
+          <p>WebSocket rank0 + distributed workers，AgiBot wrapper，action flatten，cache reset，视频保存。</p>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="node">
+          <strong>Action Head</strong>
+          <p>VAE/T5/CLIP/DiT，flow matching scheduler，KV cache，推理步数和 DiT step mask。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>动作后处理</strong>
+          <p>relative action 还原为 absolute target，Savitzky-Golay 平滑，限速/限加速度/限幅。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>真机执行</strong>
+          <p>direct-48 按 30Hz 逐行下发，arm/gripper/waist/wheel row-synced，日志回写 JSON。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>工作量拆解</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>模块</th>
+            <th>做了什么</th>
+            <th>技术点</th>
+            <th>关键文件</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Server 端 AgiBot wrapper</td>
+            <td>新增 AgiBot observation adapter，把 WebSocket 输入映射成 DreamZero 模态键；把多 key action 输出 flatten 成客户端可执行的 22 维动作。</td>
+            <td>视频 shape 兼容 <code>(H,W,C)</code> / <code>(T,H,W,C)</code>，状态 shape 兼容 scalar/1D/2D，缺 key 明确报错。</td>
+            <td><a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:322, 411, 438</td>
+          </tr>
+          <tr>
+            <td>WebSocket 协议与分布式推理</td>
+            <td>在 rank0 server 和 worker loop 中增加 AgiBot embodiment switch、metadata、health check、reset signal。</td>
+            <td>rank0 负责 WebSocket 和 pack/unpack，worker 通过 dist broadcast 接收 signal 和 batch，避免 client 直接感知多 GPU。</td>
+            <td><a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:468, 661, 693, 717</td>
+          </tr>
+          <tr>
+            <td>真机客户端</td>
+            <td>从零写 GDK live client，读取相机/机器人状态，构造 observation，连接 policy server，接收 action 并可真实下发。</td>
+            <td>固定频率采样线程、history buffer、session_id、热键停止、资源清理、action JSON 记录。</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:172, 661, 815, 1699</td>
+          </tr>
+          <tr>
+            <td>单位和坐标适配</td>
+            <td>处理 SDK 与训练分布之间的 arm order、radian/degree、gripper scale、waist lift m/cm 等差异。</td>
+            <td>夹爪 observation 保留训练时 <code>0..120</code> 物理量，不误当成 <code>0..1</code>；waist 执行时从 m 转 cm。</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:580, 587, 596, 608</td>
+          </tr>
+          <tr>
+            <td>direct-48 执行器</td>
+            <td>把原先 Ruckig 展开执行改成按模型 48 行动作直接下发，支持 30Hz 控制节拍。</td>
+            <td>每行同步 arm、gripper、waist、wheel；保留 arm delta、velocity、acceleration 安全过滤；chunk 后主动停止底盘。</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:1474, 1513, 1601</td>
+          </tr>
+          <tr>
+            <td>论文平滑策略</td>
+            <td>实现 arm-only Savitzky-Golay action smoothing，支持 window/polyorder/upsample 参数。</td>
+            <td>只平滑 14 维双臂，保留端点，不改变夹爪闭合时机，避免引入额外执行时长。</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:1032, 1059</td>
+          </tr>
+          <tr>
+            <td>推理步数对齐</td>
+            <td>修复 action head 默认硬编码 16-step 的问题，使其读取 checkpoint/config 的 <code>num_inference_timesteps</code>，并支持命令行覆盖。</td>
+            <td><code>num_inference_steps &lt;= 4</code> 时每步都跑 DiT，不再套 16-step mask，避免“4-step 参数没真正生效”。</td>
+            <td><a href="../groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py">wan_flow_matching_action_tf.py</a>:175, 915</td>
+          </tr>
+          <tr>
+            <td>cache 生命周期</td>
+            <td>补 <code>reset_inference_cache()</code>，在 session 切换、reset、client 断开时重置 KV cache、cross-attn cache、图像状态和语言状态。</td>
+            <td>解决连续任务之间 cache 污染和 causal history 错位风险。</td>
+            <td><a href="../groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py">wan_flow_matching_action_tf.py</a>:320；<a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:41</td>
+          </tr>
+          <tr>
+            <td>诊断与可观测性</td>
+            <td>记录每步动作、原始/平滑动作、采样间隔、payload、推理时延、执行时延、post-state、row log、生成视频。</td>
+            <td>把问题拆成“模型看到了什么 → 输出了什么 → server 转换了什么 → client 下发了什么 → 机器人执行成什么”。</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:1907, 2193；<a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:397</td>
+          </tr>
+          <tr>
+            <td>数据和训练适配</td>
+            <td>补 AgiBot modality、LeRobot/GEAR 转换、训练脚本和新 embodiment 配置。</td>
+            <td>22 维 action 拆分、3 视角视频、relative action stats、q99 normalization、LoRA/fine-tune 入口。</td>
+            <td><a href="../scripts/data/convert_agibot.py">convert_agibot.py</a>:29；<a href="../groot/vla/configs/data/dreamzero/base_48_wan_fine_aug_relative.yaml">base_48...</a>:175；<a href="../scripts/train/agibot_training.sh">agibot_training.sh</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>关键问题与解决方式</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>遇到的问题</th>
+            <th>根因判断</th>
+            <th>解决方案</th>
+            <th>可展示结果</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>官方没有直接可用的 AgiBot 真机 server/client</td>
+            <td>论文/权重给的是模型能力，但真机需要明确 observation schema、WebSocket 元数据、机器人 SDK 执行器。</td>
+            <td>补 AgiBot policy wrapper 和 GDK live client，约定 <code>top_head/hand_left/hand_right</code>、双臂、夹爪、头、腰、底盘的输入输出协议。</td>
+            <td>服务端 metadata 显示 <code>action_space=agibot_flattened</code>，客户端可连续推理并生成 action JSON。</td>
+          </tr>
+          <tr>
+            <td>DROID schema 与 AgiBot schema 不兼容</td>
+            <td>DROID 是单臂/少量相机，AgiBot 是双臂移动操作，action key 和 state key 完全不同。</td>
+            <td>在 server wrapper 中显式维护 <code>VIDEO_KEY_MAPPING</code>、<code>STATE_KEY_MAPPING</code> 和 action flatten 顺序。</td>
+            <td>模型输出统一变成 <code>(48,22)</code>，client 可按维度解析双臂、夹爪、头、腰、底盘。</td>
+          </tr>
+          <tr>
+            <td>动作执行被 Ruckig 展开得过慢</td>
+            <td>模型本来输出 48 行 chunk；Ruckig 插值把每段展开成大量点，导致执行时长从论文假设的 1.6s 拉长到十几秒量级。</td>
+            <td>实现 <code>direct-48</code>：每个 row 直接下发一次 <code>move_arm</code>，按 <code>direct_control_hz=30</code> 节拍执行；保留限幅、限速、限加速度。</td>
+            <td>执行流式时长稳定约 <code>1.60s</code>，完整 chunk 约 <code>1.80s</code>，与论文 48/30Hz 对齐。</td>
+          </tr>
+          <tr>
+            <td>推理步数和论文/配置不一致</td>
+            <td>action head 曾经硬编码 <code>num_inference_steps=16</code>，导致 <code>num_inference_timesteps=4</code> 没真正控制 denoising loop。</td>
+            <td>改为读取 config/checkpoint，server 支持 <code>--num-inference-timesteps</code>，并在 4-step 下禁用 16-step mask 跳步逻辑。</td>
+            <td>日志能看到 <code>DIT Compute Steps 4</code>，稳态推理从约 6.6s 降到约 2.6-3.0s 的量级。</td>
+          </tr>
+          <tr>
+            <td>连续任务后动作不稳定</td>
+            <td>DreamZero action head 是有状态 causal policy，内部维护 KV cache、cross-attn cache、<code>current_start_frame</code> 和语言状态。</td>
+            <td>增加 <code>reset_inference_cache()</code>，在 reset、session 切换、连接关闭时让 rank0 和 worker 都清缓存。</td>
+            <td>减少 prompt 切换/任务切换后继承上轮状态的风险。</td>
+          </tr>
+          <tr>
+            <td>三路多帧图像 WebSocket payload 大</td>
+            <td><code>4 帧 × 3 相机 × 640×480×3</code> 原始图像 payload 很大，会放大网络和序列化开销。</td>
+            <td>支持 <code>--image-transport jpeg</code> 和质量参数；server 端支持 JPEG sequence 解码，并记录 raw/tx payload。</td>
+            <td>每步日志可直接比较 raw payload 与 transmitted payload。</td>
+          </tr>
+          <tr>
+            <td>异步推理效果变差</td>
+            <td>投机预取会提前推进有状态 action head 的 causal cache；如果结果过期或被拒绝，主 cache 可能已经被污染。</td>
+            <td>实现 speculative 框架但默认关闭；加入边界状态 drift、age、ready-at-boundary 检查；面试中明确说明需要独立 cache/rollback 才能做严格异步。</td>
+            <td>展示你不是盲目打开论文功能，而是识别了 stateful cache 的系统风险。</td>
+          </tr>
+          <tr>
+            <td>抓取空抓、高度不准、软物体夹坏</td>
+            <td>关节空间误差会放大到末端高度；gripper close 值对纸杯/餐巾纸这类软物体很敏感。</td>
+            <td>基于 action log 分析抓取时刻、关节趋势和 gripper 变化；增加 <code>--gripper-closed-value</code>，并提出高度补偿/normalization stats/推理步数对比方案。</td>
+            <td>能把失败拆成视觉规划、动作映射、执行接触高度、夹爪策略四类，而不是只说“模型不好”。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>量化结果口径</h2>
+      <div class="grid three">
+        <div class="card">
+          <div class="kpi">48 / 30Hz</div>
+          <p>direct-48 模式把一个 action chunk 按 30Hz 执行，理论时长 <code>48 / 30 = 1.6s</code>。</p>
+        </div>
+        <div class="card">
+          <div class="kpi">1.60s</div>
+          <p>日志中流式执行时长稳定约 <code>1.60s</code>，完整 chunk 约 <code>1.80s</code>。</p>
+        </div>
+        <div class="card">
+          <div class="kpi">2.6-3.0s</div>
+          <p>修复 4-step 生效后，服务端稳态推理曾记录约 <code>2.6-3.0s</code>。</p>
+        </div>
+      </div>
+      <div class="callout gold">
+        面试中要主动说明边界：这套工程已经把执行侧对齐到论文的 48-step/30Hz，但完整闭环还没达到论文 Flash/GB200 级别的 7Hz。当前瓶颈主要在模型推理时延、真正异步 cache 隔离和 Flash/TensorRT/低层 kernel 优化。
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>阶段</th>
+            <th>现象</th>
+            <th>我做的改动</th>
+            <th>结果/认知</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>执行侧</td>
+            <td>Ruckig 执行把动作 chunk 拉长，机器人反应很慢。</td>
+            <td>direct-48、30Hz tick、短 <code>arm_close_timeout</code>、row-synced gripper/waist/wheel。</td>
+            <td>执行侧已接近论文节拍，后续不应优先纠结执行器。</td>
+          </tr>
+          <tr>
+            <td>推理侧</td>
+            <td>16-step 或多帧 VAE 使推理慢，首步还包含 compile/warmup。</td>
+            <td>让 <code>num_inference_timesteps</code> 真正生效，打印 Text/Image/VAE/KV/Diffusion 分项耗时。</td>
+            <td>可以定位瓶颈在 VAE/DiT/调度，而不是 WebSocket 或 GDK。</td>
+          </tr>
+          <tr>
+            <td>观测侧</td>
+            <td>4 帧 @ 5FPS 与单帧 @ 30FPS 有质量和时延权衡。</td>
+            <td>client 和 server 都支持多帧 history，也能回到单帧配置做 ablation。</td>
+            <td>下一步推荐固定同一场景对比 <code>4@5</code> 与 <code>1@30</code>。</td>
+          </tr>
+          <tr>
+            <td>诊断侧</td>
+            <td>失败时很难判断是模型没理解、server 变换错、还是机器人没跟上。</td>
+            <td>生成视频、任务实拍视频、action JSON、row log、post-state、payload/timing 全部记录。</td>
+            <td>把调试从“看现象”变成可复盘的链路定位。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>代码证据索引</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>你要证明的能力</th>
+            <th>代码证据</th>
+            <th>面试解释</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>我能把论文模型接入真机协议</td>
+            <td><a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:322-465</td>
+            <td>AgiBot wrapper 完成 observation mapping、JPEG/multiframe decode、state normalize、action flatten。</td>
+          </tr>
+          <tr>
+            <td>我理解分布式推理和 server 生命周期</td>
+            <td><a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:468-825</td>
+            <td>rank0 处理 WebSocket，worker loop 处理 broadcast signal/batch；支持 reset cache、metadata、视频保存。</td>
+          </tr>
+          <tr>
+            <td>我能处理机器人 SDK 和训练分布差异</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:580-720</td>
+            <td>处理 arm order、角度单位、gripper scale、waist 单位，以及 observation schema。</td>
+          </tr>
+          <tr>
+            <td>我能把模型动作按论文节奏执行</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:1474-1653</td>
+            <td>direct-48 执行器逐行下发动作，统一 arm/gripper/waist/wheel tick，带安全限幅。</td>
+          </tr>
+          <tr>
+            <td>我能做论文一致性修复</td>
+            <td><a href="../groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py">wan_flow_matching_action_tf.py</a>:175-224, 915-921</td>
+            <td>推理步数读取 config，DiT step mask 与 4-step 路径分开处理。</td>
+          </tr>
+          <tr>
+            <td>我能识别 stateful policy 的 cache 问题</td>
+            <td><a href="../groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py">wan_flow_matching_action_tf.py</a>:320-328；<a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>:41-49</td>
+            <td>reset KV/cross-attn/image/language 状态，防止跨 session 污染。</td>
+          </tr>
+          <tr>
+            <td>我能做系统可观测性</td>
+            <td><a href="../robot_live_client.py">robot_live_client.py</a>:1907-1985, 2193-2245</td>
+            <td>每步 action JSON 保存推理、观测、执行、post-state、speculative 信息。</td>
+          </tr>
+          <tr>
+            <td>我能补数据训练链路</td>
+            <td><a href="../scripts/data/convert_agibot.py">convert_agibot.py</a>:29-170；<a href="../scripts/train/agibot_training.sh">agibot_training.sh</a></td>
+            <td>定义 AgiBot state/action/video modality、stats、LeRobot 兼容保存和训练启动参数。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Git 工作量口径</h2>
+      <p>
+        不建议面试时只讲行数，但可以用 git 提交作为工程规模证据。下面是仓库里能直接看到的提交口径。
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>提交</th>
+            <th>主题</th>
+            <th>规模</th>
+            <th>可归纳为</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>f6d5bb5</code></td>
+            <td>Add AgiBot inference support and local server utilities</td>
+            <td>9 files，约 1787 insertions</td>
+            <td>最初打通 AgiBot server、测试 client、本地启动脚本。</td>
+          </tr>
+          <tr>
+            <td><code>743f36e</code></td>
+            <td>Add G1 live client for AgiBot inference</td>
+            <td>1 file，约 192 insertions</td>
+            <td>GDK 真机 client 雏形。</td>
+          </tr>
+          <tr>
+            <td><code>38aa856</code></td>
+            <td>Update AgiBot live client controls</td>
+            <td>约 712 insertions / 71 deletions</td>
+            <td>真机执行控制、夹爪、腰部、底盘、日志增强。</td>
+          </tr>
+          <tr>
+            <td><code>986d43c</code></td>
+            <td>Add agibot observation history and speculative inference scaffolding</td>
+            <td>约 875 insertions / 106 deletions</td>
+            <td>固定 FPS、history buffer、异步/投机推理框架。</td>
+          </tr>
+          <tr>
+            <td><code>6f34b5d</code></td>
+            <td>Update AgiBot live inference controls</td>
+            <td>约 722 insertions / 61 deletions</td>
+            <td>direct-48、4-step、cache reset、视频保存、平滑和调参。</td>
+          </tr>
+          <tr>
+            <td><code>f109fe5</code></td>
+            <td>sync agibot live client updates</td>
+            <td>27 files，约 4427 insertions / 608 deletions</td>
+            <td>文档、启动指南、WAN2.2 说明、policy client/server 同步。</td>
+          </tr>
+          <tr>
+            <td>当前未提交 diff</td>
+            <td>client/server/config 继续更新</td>
+            <td>12 files，约 425 insertions / 35 deletions，另有若干新脚本和数据文件</td>
+            <td>任务视频录制、payload metadata、数据配置和手部视频转换等补充。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>面试表达建议</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>一分钟版本</h3>
+          <p>
+            我主要补齐了 DreamZero 到 AgiBot 真机的完整推理闭环。论文给出 WAM 机制和权重，但真机要解决 server/client 协议、三路相机与 proprio 的模态映射、双臂 22 维动作解析、GDK 单位和左右臂顺序、48-step chunk 按 30Hz 执行、cache reset、视频和动作日志诊断等问题。我最后把系统做成可启动、可复现、可调参的 server/client，并通过日志定位出当前主要瓶颈从执行侧转移到推理侧。
+          </p>
+        </div>
+        <div class="card">
+          <h3>技术亮点版本</h3>
+          <p>
+            我比较深入的点是没有把模型当黑盒。DreamZero 是 stateful autoregressive diffusion policy，内部 KV cache 会跨 chunk 影响结果，所以 session/reset/投机推理都不能简单处理。我修了推理步数和 DiT step mask 的一致性问题，也识别了 speculative inference 会污染主 cache 的风险，因此默认保守关闭，后续需要独立 cache 或 rollback 机制。这类问题比写一个 WebSocket client 更关键。
+          </p>
+        </div>
+      </div>
+
+      <h3>STAR 回答模板</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>问题</th>
+            <th>回答结构</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>你最大的工作量是什么？</td>
+            <td><strong>S</strong>：官方没有 AgiBot 真机 server/client。<strong>T</strong>：要把论文权重变成真机闭环。<strong>A</strong>：补 wrapper、协议、GDK client、direct-48 执行、日志、cache reset。<strong>R</strong>：能连续推理、执行、保存 action JSON 和生成视频，执行节奏对齐 48/30Hz。</td>
+          </tr>
+          <tr>
+            <td>你遇到最难的问题是什么？</td>
+            <td>不是单个 bug，而是多层语义错位：模型输出是 relative 还是 absolute、SDK 单位是否一致、动作是否被 Ruckig 改坏、cache 是否被跨任务污染。我的方法是把链路拆成五层并逐层加日志。</td>
+          </tr>
+          <tr>
+            <td>为什么 direct-48 重要？</td>
+            <td>论文假设每个 action chunk 是 48 step、30Hz、1.6 秒。如果 client 把 48 行动作重插值成长轨迹，就破坏了训练/推理时序。direct-48 让真实执行更接近模型的 action horizon。</td>
+          </tr>
+          <tr>
+            <td>为什么没有直接开异步？</td>
+            <td>DreamZero 的 action head 有 KV cache。投机推理如果写入主 cache，而结果最后被拒绝，就会让后续同步推理看到错误历史。所以我先实现框架和状态检查，但默认关闭；严格方案应做分支 cache 或 rollback。</td>
+          </tr>
+          <tr>
+            <td>为什么推理还达不到论文 7Hz？</td>
+            <td>论文 7Hz 依赖完整系统优化和 Flash/量化/kernel 路线。我的版本在现有硬件和开源代码基础上完成真机闭环与关键一致性修复，执行侧已对齐 1.6s，剩余瓶颈是推理侧，需要进一步做 Flash/TensorRT/独立 cache 异步。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>后续路线图</h2>
+      <ol>
+        <li><strong>推理分项 metrics 入 JSON</strong>：把 server 的 Text/Image/VAE/KV/Diffusion/DIT Compute Steps 写到每步记录中，减少人工读日志。</li>
+        <li><strong>观测 ablation</strong>：在同一场景对比 <code>4帧@5FPS</code>、<code>1帧@30FPS</code>、<code>9帧@30FPS</code> 的生成视频、动作质量和推理时延。</li>
+        <li><strong>安全异步</strong>：实现 speculative branch cache 或 cache rollback，避免预取污染主 causal state。</li>
+        <li><strong>推理优化</strong>：评估 Flash/1-step、TensorRT、scheduler GPU 化、低精度量化；目标是让推理低于 1.6s chunk 时长。</li>
+        <li><strong>任务级 benchmark</strong>：固定 prompt、物体位置、起始姿态，统计抓取/放置/擦拭成功率，而不是单次主观判断。</li>
+        <li><strong>执行一致性日志</strong>：可选开启 row-level log，并以低频读回状态验证 SDK 是否跟上 30Hz row target。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>材料来源</h2>
+      <ul>
+        <li>论文：<a href="../DreamZero.pdf">DreamZero.pdf</a>，重点阅读 Abstract、Section 3、Appendix C/D/E。</li>
+        <li>服务端：<a href="../socket_test_optimized_AR.py">socket_test_optimized_AR.py</a>、<a href="../eval_utils/policy_server.py">eval_utils/policy_server.py</a>。</li>
+        <li>客户端：<a href="../robot_live_client.py">robot_live_client.py</a>、<a href="../eval_utils/policy_client.py">eval_utils/policy_client.py</a>。</li>
+        <li>模型：<a href="../groot/vla/model/dreamzero/action_head/wan_flow_matching_action_tf.py">wan_flow_matching_action_tf.py</a>、<a href="../groot/vla/model/n1_5/sim_policy.py">sim_policy.py</a>。</li>
+        <li>数据训练：<a href="../scripts/data/convert_agibot.py">convert_agibot.py</a>、<a href="../groot/vla/configs/data/dreamzero/base_48_wan_fine_aug_relative.yaml">base_48_wan_fine_aug_relative.yaml</a>、<a href="../scripts/train/agibot_training.sh">agibot_training.sh</a>。</li>
+        <li>已有调试文档：<a href="2026-04-17_AgiBot推理复现差距优化计划.md">AgiBot推理复现差距优化计划</a>、<a href="2026-04-27_AgiBot论文一致性对齐计划.md">AgiBot论文一致性对齐计划</a>、<a href="2026-04-28_AgiBot真机调试记录.md">AgiBot真机调试记录</a>、<a href="2026-05-12_DreamZero真机启动指南.md">DreamZero真机启动指南</a>。</li>
+      </ul>
+      <div class="callout red">
+        面试时不要说“已经完全复现论文 7Hz”。更准确的说法是：我补齐了官方缺失的 AgiBot 真机闭环工程，把执行侧对齐到论文设定，并定位了距离论文实时系统还差的推理优化和异步 cache 机制。
+      </div>
+    </section>
+  </div>
+</body>
+</html>

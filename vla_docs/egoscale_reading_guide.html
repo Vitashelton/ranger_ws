@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EgoScale 论文精读辅助</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --paper: #ffffff;
+      --ink: #17202a;
+      --muted: #627084;
+      --line: #d9dee8;
+      --blue: #2457a6;
+      --green: #18745a;
+      --red: #ad3e37;
+      --gold: #8a6500;
+      --violet: #6850a7;
+      --code: #101828;
+      --soft-blue: #eaf1fb;
+      --soft-green: #eaf7f1;
+      --soft-red: #fbefed;
+      --soft-gold: #fff5d9;
+      --soft-violet: #f0edfb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.65;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 34px 24px 64px;
+    }
+
+    header {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.25;
+      margin: 0 0 14px;
+      letter-spacing: 0;
+    }
+
+    h1 { font-size: 30px; }
+    h2 { font-size: 22px; margin-top: 4px; }
+    h3 { font-size: 17px; margin-top: 22px; }
+    p { margin: 0 0 12px; }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 920px;
+      font-size: 15px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      color: #354154;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: rgba(246, 247, 249, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+      margin: 0 -24px 18px;
+      padding: 10px 24px;
+    }
+
+    nav .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    nav a {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #354154;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      margin-top: 18px;
+      scroll-margin-top: 72px;
+    }
+
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+
+    .callout {
+      border-left: 4px solid var(--blue);
+      background: var(--soft-blue);
+      padding: 14px 16px;
+      border-radius: 6px;
+      margin: 12px 0 16px;
+    }
+
+    .callout.green { border-left-color: var(--green); background: var(--soft-green); }
+    .callout.red { border-left-color: var(--red); background: var(--soft-red); }
+    .callout.gold { border-left-color: var(--gold); background: var(--soft-gold); }
+    .callout.violet { border-left-color: var(--violet); background: var(--soft-violet); }
+
+    ul, ol { margin: 8px 0 0 22px; padding: 0; }
+    li { margin: 5px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2f7;
+      text-align: left;
+      font-weight: 650;
+    }
+
+    code {
+      background: #eef2f7;
+      color: var(--code);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: #263449;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+      margin: 14px 0;
+    }
+
+    .node {
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+      border-radius: 8px;
+      padding: 13px;
+      min-height: 116px;
+    }
+
+    .arrow {
+      color: var(--muted);
+      align-self: center;
+      font-size: 22px;
+      padding: 0 2px;
+    }
+
+    .tag {
+      display: inline-block;
+      min-width: 58px;
+      text-align: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-right: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .tag.green { background: var(--green); }
+    .tag.red { background: var(--red); }
+    .tag.gold { background: var(--gold); }
+    .tag.violet { background: var(--violet); }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .kpi {
+      font-size: 26px;
+      font-weight: 750;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .formula {
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .badge {
+      border-radius: 8px;
+      background: #eef2f7;
+      border: 1px solid var(--line);
+      padding: 7px 8px;
+      font-weight: 700;
+      text-align: center;
+      color: #354154;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .grid.two, .grid.three, .grid.four, .flow {
+        grid-template-columns: 1fr;
+      }
+      .arrow { display: none; }
+      header, section { padding: 18px; }
+      h1 { font-size: 24px; }
+      nav { position: static; }
+      .step { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>EgoScale 论文精读辅助</h1>
+      <p class="subtitle">
+        论文：<em>EgoScale: Scaling Dexterous Manipulation with Diverse Egocentric Human Data</em>。这份 HTML 按“先抓主线、再拆方法、最后带着问题读实验”的方式组织，帮助快速判断它对灵巧操作、VLA、真机数据闭环的价值。
+      </p>
+      <div class="meta">
+        <span class="pill">arXiv:2602.16710</span>
+        <span class="pill">提交：2026-02-18</span>
+        <span class="pill">NVIDIA / UC Berkeley / UMD</span>
+        <span class="pill">主题：Robotics / Dexterous Manipulation</span>
+        <span class="pill">输出文件：dreamzero/docs/egoscale_reading_guide.html</span>
+      </div>
+    </header>
+
+    <nav>
+      <div class="nav-inner">
+        <a href="#one-line">一句话</a>
+        <a href="#route">阅读路线</a>
+        <a href="#method">方法拆解</a>
+        <a href="#experiments">实验读法</a>
+        <a href="#figures">图表指南</a>
+        <a href="#critique">质疑清单</a>
+        <a href="#transfer">工程启发</a>
+        <a href="#sources">来源</a>
+      </div>
+    </nav>
+
+    <section id="one-line">
+      <h2>一句话读懂</h2>
+      <div class="callout green">
+        EgoScale 的核心论点是：面向灵巧操作的人到机器人迁移，不只是“对齐表示”的问题，更是一个 scaling 问题。先用 20,854 小时带动作标签的第一视角人类视频预训练 VLA，再用少量人机对齐数据做 mid-training，最后用少量机器人任务数据 post-training，可以显著提高 22-DoF 灵巧手任务表现，并迁移到更低 DoF 的机器人手。
+      </div>
+      <div class="grid four">
+        <div class="card">
+          <div class="kpi">20,854h</div>
+          <p>大规模第一视角人类操作视频，论文称比 prior efforts 大 20 倍以上。</p>
+        </div>
+        <div class="card">
+          <div class="kpi">R² 0.9983</div>
+          <p>人类动作预测验证损失与数据规模呈近似 log-linear 关系。</p>
+        </div>
+        <div class="card">
+          <div class="kpi">+54%</div>
+          <p>最终策略相对无预训练 baseline 的平均成功率提升。</p>
+        </div>
+        <div class="card">
+          <div class="kpi">1 demo</div>
+          <p>在 one-shot 设置里，用一个机器人 demo 加人类对齐 demo 学新技能。</p>
+        </div>
+      </div>
+      <h3>最值得记住的三件事</h3>
+      <ul>
+        <li><span class="tag">规模</span>论文不是只做一个 human-to-robot trick，而是系统研究 1k、2k、4k、10k、20k 小时数据下的趋势。</li>
+        <li><span class="tag green">动作</span>它把人类视频转成 wrist motion + retargeted hand joint actions，而不是只学视觉表征。</li>
+        <li><span class="tag gold">对齐</span>它仍然需要小规模但高质量的人机对齐数据；这部分是把人类 motor prior 接到机器人控制空间的关键。</li>
+      </ul>
+    </section>
+
+    <section id="route">
+      <h2>推荐阅读路线</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>快速读法：30 分钟</h3>
+          <ol>
+            <li>先看 Abstract、Figure 1，确认三阶段训练闭环。</li>
+            <li>读 2.1 和 2.2，重点看人类动作标签怎么从视频中得到。</li>
+            <li>读 3.2 和 3.3，抓住主结果和 scaling law。</li>
+            <li>扫 3.4、3.5、3.6，分别对应 one-shot、跨 embodiment、action representation ablation。</li>
+            <li>最后看 Appendix D，理解 hand retargeting 的工程代价。</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>深读问题：2 小时</h3>
+          <ol>
+            <li>验证论文的“人类验证损失可预测机器人性能”是否只在同一模型族和任务族内成立。</li>
+            <li>判断 mid-training 到底有多“轻量”：50h 人类 + 4h 机器人数据虽小，但采集非常精确。</li>
+            <li>检查 22-DoF Sharpa hand action space 是否真的 embodiment-agnostic，还是强依赖手型。</li>
+            <li>把结果拆成 scale、representation、alignment、post-training data 四个因素，不要混成一个结论。</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="method">
+      <h2>方法拆解</h2>
+      <div class="flow">
+        <div class="node">
+          <strong>Stage I</strong>
+          <p>大规模第一视角人类视频预训练：动作标签来自 SLAM/手部姿态估计，再转成 wrist + hand actions。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>Stage II</strong>
+          <p>少量人机对齐 play data：相机视角、运动捕捉、手套动作和机器人控制空间更精确对齐。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>Stage III</strong>
+          <p>任务 post-training：在具体机器人任务 demo 上微调，评估长程灵巧操作和少样本泛化。</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node">
+          <strong>Robot</strong>
+          <p>R1Pro + 22-DoF Sharpa hands 为主，Unitree G1 + 7-DoF tri-finger hand 做跨 embodiment 验证。</p>
+        </div>
+      </div>
+
+      <h3>2.1 Human Action Representation</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>组件</th>
+            <th>论文做法</th>
+            <th>为什么重要</th>
+            <th>阅读时要问</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Wrist-level arm motion</td>
+            <td>用连续时刻之间的相对 wrist motion 表示手臂动作，减少对绝对相机位姿的依赖。</td>
+            <td>这是跨人类视频和机器人执行共享的 arm-level action abstraction。</td>
+            <td>相对 wrist motion 对遮挡、SLAM drift、相机抖动有多敏感？</td>
+          </tr>
+          <tr>
+            <td>Hand articulation</td>
+            <td>把 21 个手部 keypoints retarget 到 22-DoF Sharpa hand joint space。</td>
+            <td>避免只学 fingertip 或 wrist，保留手指关节的闭合、捏取、旋转等细节。</td>
+            <td>不同机械手的关节拓扑差异会不会让这个 prior 偏向 Sharpa？</td>
+          </tr>
+          <tr>
+            <td>Optimization retargeting</td>
+            <td>Appendix D 描述用 URDF forward kinematics、CasADi/IPOPT、joint limits、warm start 和 smoothing。</td>
+            <td>动作标签不是天然存在的，质量取决于感知和重定向链路。</td>
+            <td>大规模数据里 retargeting 失败样本如何过滤？论文正文没有展开太多。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2.2 数据来源与对齐</h3>
+      <div class="grid three">
+        <div class="card">
+          <h3>大规模但噪声高</h3>
+          <p>Stage I 包含 20,854 小时第一视角人类操作视频，覆盖 9,869 scenes、6,015 tasks、43,237 objects。优势是长尾、多样、规模大。</p>
+        </div>
+        <div class="card">
+          <h3>EgoDex 作为精确补充</h3>
+          <p>论文额外加入 829 小时 EgoDex，用 Apple Vision Pro 采集，提供更高精度的 wrist 和 hand tracking。</p>
+        </div>
+        <div class="card">
+          <h3>对齐数据小但关键</h3>
+          <p>Stage II 包含 344 个 tabletop manipulation tasks，每个任务约 30 条 human trajectories、5 条 robot trajectories，总计约 50h 人类数据和 4h 机器人数据。</p>
+        </div>
+      </div>
+
+      <h3>2.3 模型结构</h3>
+      <div class="callout violet">
+        这不是纯视觉预训练模型，而是 flow-based VLA。模型用 VLM backbone 编码图像和语言，用 DiT action expert 预测未来 action chunk；人类和机器人数据通过 wrist-level action representation 共享主体结构，再用轻量 embodiment-specific adapters 处理不同 proprioception 和 hand action spaces。
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>模块</th>
+            <th>作用</th>
+            <th>对应理解</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>VLM backbone</td>
+            <td>编码 RGB observation 和语言指令。</td>
+            <td>提供语义和视觉上下文，不单独承担动作对齐。</td>
+          </tr>
+          <tr>
+            <td>Flow matching action model</td>
+            <td>以扩散/flow 风格生成未来动作 chunk。</td>
+            <td>动作输出是分布式生成，而不是单点回归。</td>
+          </tr>
+          <tr>
+            <td>Human proprio placeholder</td>
+            <td>人类视频没有机器人 proprioception，论文用 learnable placeholder token 统一输入接口。</td>
+            <td>这让 human/robot 数据能共用模型公式，但也提醒我们人类侧没有真实 robot state。</td>
+          </tr>
+          <tr>
+            <td>Embodiment adapters</td>
+            <td>对不同机器人状态和手部动作空间做输入/输出 MLP 适配。</td>
+            <td>跨 embodiment 的“共享”主要发生在 wrist/VLM/DiT 主干，末端控制仍需 adapter。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2.4 三阶段训练</h3>
+      <div class="timeline">
+        <div class="step">
+          <div class="badge">Stage I</div>
+          <div class="card">
+            <strong>Human pretraining</strong>
+            <p>20k 小时级人类数据，训练 100K steps，论文使用 256 GB200 GPUs、global batch size 8,192，并全量解冻 VLA 参数来吸收大规模数据。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="badge">Stage II</div>
+          <div class="card">
+            <strong>Aligned mid-training</strong>
+            <p>人机对齐 play data，训练 50K steps、batch size 2,048。冻结 vision-language backbone，更新 vision encoder 和 DiT action expert，把预训练表示锚定到机器人 sensing/control。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="badge">Stage III</div>
+          <div class="card">
+            <strong>Task post-training</strong>
+            <p>具体任务机器人 demo 上训练 10K steps、batch size 512。若使用 mid-training，则 post-training 时 vision encoder 冻结；否则会按新 embodiment 需要解冻。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experiments">
+      <h2>实验读法</h2>
+      <h3>五个主任务</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>任务</th>
+            <th>为什么难</th>
+            <th>数据设置</th>
+            <th>读结果时看什么</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Shirt Rolling</td>
+            <td>双手协作、变形物、长程连续操作。</td>
+            <td>20 条机器人 demos。</td>
+            <td>更依赖 coarse bimanual motion 和 long-horizon structure。</td>
+          </tr>
+          <tr>
+            <td>Card Sorting</td>
+            <td>从紧密牌堆中搓开单张卡片，接触和手指时序敏感。</td>
+            <td>100 条机器人 demos。</td>
+            <td>最能暴露 hand action representation 是否有效。</td>
+          </tr>
+          <tr>
+            <td>Tong Fruit Transfer</td>
+            <td>先抓工具再用工具抓水果，包含 tool-use 和接触稳定性。</td>
+            <td>每个瓶/物体实例多次评估，论文该任务共 16 trials。</td>
+            <td>看是否只是抓到工具，还是能完成二阶段工具使用。</td>
+          </tr>
+          <tr>
+            <td>Bottle Cap Unscrewing</td>
+            <td>连续旋转、双手配合、瓶子尺寸泛化。</td>
+            <td>四个瓶子，每瓶 25 trajectories。</td>
+            <td>看旋转连续性，而不仅是 grasp 成功。</td>
+          </tr>
+          <tr>
+            <td>Syringe Liquid Transfer</td>
+            <td>长程、多步骤、精确空间对准和 plunger 控制。</td>
+            <td>100 条机器人 demos。</td>
+            <td>它是最像“组合技能链”的压力测试。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>关键结果</h3>
+      <div class="grid two">
+        <div class="card">
+          <h3>RQ1：大规模人类预训练是否有效？</h3>
+          <p>有效。论文报告 human pretraining 在所有任务上相对 scratch 有稳定增益，平均 task completion 提升超过 55%；human pretraining + aligned mid-training 整体最好。</p>
+          <p class="small">读法：这里证明的是 scale + motion supervision 的组合有效，不是“只靠视频就能直接控制机器人”。</p>
+        </div>
+        <div class="card">
+          <h3>RQ2：数据规模如何影响性能？</h3>
+          <p>从 1k 到 20k 小时，平均 task completion 从 0.30 单调上升到 0.71。人类动作验证损失与数据规模呈 log-linear，拟合 R²=0.9983。</p>
+          <p class="small">读法：最强卖点是 offline validation loss 和 real-robot performance 的相关性。</p>
+        </div>
+        <div class="card">
+          <h3>RQ3：mid-training 对 one-shot 有什么作用？</h3>
+          <p>只靠 human pretrain 或只靠 midtrain 在 one-shot setting 都不够；Pretrain + Midtrain 在 Fold Shirt 达到 0.88 success，在 Unscrewing Water Bottles 达到 0.55 success。</p>
+          <p class="small">读法：mid-training 是迁移开关，不是可有可无的小修饰。</p>
+        </div>
+        <div class="card">
+          <h3>RQ4：能跨机器人 embodiment 吗？</h3>
+          <p>论文在 Unitree G1 + 7-DoF tri-finger hand 上验证，加入 G1 play data 的 mid-training 后，Human-pretrained policy 优于只用 G1 数据训练的 baseline，并报告两项任务都有明显提升。</p>
+          <p class="small">读法：跨 embodiment 不是零数据迁移，而是“人类 prior + embodiment-specific adapter + 少量对齐”。</p>
+        </div>
+      </div>
+
+      <h3>Action representation ablation</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>表示</th>
+            <th>论文观察</th>
+            <th>我的阅读判断</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Wrist-only</td>
+            <td>在需要精确手指接触和闭合时序的任务上表现差。</td>
+            <td>只学手腕会丢掉灵巧操作真正贵的信号。</td>
+          </tr>
+          <tr>
+            <td>Fingertip-based</td>
+            <td>比 wrist-only 丰富，但 fingertip 小误差映射到关节空间会导致不稳定抓取。</td>
+            <td>几何点位不是控制接口，后处理映射会放大误差。</td>
+          </tr>
+          <tr>
+            <td>Retargeted joint-space hand actions</td>
+            <td>在多任务上最稳定，是论文默认方案。</td>
+            <td>这也是整篇论文最工程化、最难复现的一环。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="figures">
+      <h2>图表阅读指南</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>Figure 1：总 pipeline</h3>
+          <p>看清楚 pretrain、midtrain、post-train 的边界。不要把 20k 小时人类视频误解成直接 robot policy data；它先学习 wrist/hand motor prior，再通过对齐数据落到机器人。</p>
+        </div>
+        <div class="card">
+          <h3>Figure 2：数据采集与模型架构</h3>
+          <p>左侧说明 aligned data 的传感器匹配很强；右侧说明 VLM + DiT action expert + adapters 的结构。这里能看出 mid-training 的工程含金量。</p>
+        </div>
+        <div class="card">
+          <h3>Figure 4：主任务结果</h3>
+          <p>重点比较四个 checkpoint：scratch、midtrain-only、human-pretrain-only、human-pretrain+midtrain。最佳结果来自 scale 和 alignment 的叠加。</p>
+        </div>
+        <div class="card">
+          <h3>Figure 5：scaling law</h3>
+          <p>整篇论文的核心证据。左图看训练曲线和过拟合，中心看 log-linear，右图看机器人 task completion 随 scale 上升。</p>
+        </div>
+        <div class="card">
+          <h3>Figure 6：one-shot transfer</h3>
+          <p>看“缺 human pretrain”或“缺 midtrain”时失败，说明 one-shot 能力来自两阶段配合，而非某一个阶段单独带来。</p>
+        </div>
+        <div class="card">
+          <h3>Figure 7/8：泛化与表示消融</h3>
+          <p>Figure 7 支撑跨 embodiment 论点；Figure 8 支撑 hand joint-space action representation 的必要性。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="critique">
+      <h2>质疑清单</h2>
+      <div class="callout red">
+        这篇论文的主张很强，但不是没有边界。精读时建议把“论文证据支持什么”和“未来可能推广到什么”分开。
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>问题</th>
+            <th>为什么重要</th>
+            <th>读论文时的判断</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Scaling law 是否能外推？</td>
+            <td>论文只在 1k-20k 小时和特定模型/任务族下验证。</td>
+            <td>论文自己也谨慎表示不 extrapolate beyond measured range。可以相信趋势，但不能直接预测 100k 小时会怎样。</td>
+          </tr>
+          <tr>
+            <td>验证损失和真机性能的相关性是否普适？</td>
+            <td>这是把 offline metric 当作机器人能力指标的关键。</td>
+            <td>在本文设置中很有价值，但换 embodiment、模型容量、任务分布后需要重新校准。</td>
+          </tr>
+          <tr>
+            <td>动作标签质量是否是隐藏变量？</td>
+            <td>SLAM、hand pose estimation、retargeting 都会引入噪声。</td>
+            <td>规模能抵消一部分噪声，但 retargeted joint-space label 的质量仍可能决定上限。</td>
+          </tr>
+          <tr>
+            <td>mid-training 真的“轻量”吗？</td>
+            <td>50h human + 4h robot 不多，但采集需要匹配视角、Vive trackers、Manus gloves、同步信号。</td>
+            <td>数据量轻，采集系统不轻。工程复现时这部分不是小成本。</td>
+          </tr>
+          <tr>
+            <td>22-DoF action space 是否 embodiment-agnostic？</td>
+            <td>论文说 human motion 是 reusable motor prior，但默认 hand space 来自 Sharpa。</td>
+            <td>G1 结果支持可迁移性，但迁移仍依赖 adapters 和 G1 play data。不要读成无条件零样本。</td>
+          </tr>
+          <tr>
+            <td>评估规模是否足够？</td>
+            <td>真机 trials 昂贵，论文每 seed/任务的 trial 数有限。</td>
+            <td>结果有说服力，但对小差异不要过度解读；更关注趋势和大幅差距。</td>
+          </tr>
+          <tr>
+            <td>算力门槛是否过高？</td>
+            <td>Stage I 使用 256 GB200 GPUs 训练 100K steps。</td>
+            <td>这是研究结论强的同时也最难复现的部分。小团队更现实的切入点是复现 Stage II/III 或 action representation。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="transfer">
+      <h2>对你做 VLA / 真机闭环的启发</h2>
+      <div class="grid two">
+        <div class="card">
+          <h3>1. 数据闭环要分成“规模”和“对齐”</h3>
+          <p>如果只有少量高质量机器人数据，容易欠多样性；如果只有大规模人类视频，落不到机器人控制空间。EgoScale 的实用配方是先让人类数据学 motor prior，再用小而准的 aligned data 接上机器人。</p>
+        </div>
+        <div class="card">
+          <h3>2. 动作表示比模型名更关键</h3>
+          <p>论文最核心的工程选择不是某个 transformer 变体，而是 relative wrist motion + retargeted hand joint actions。做 AgiBot/G1/R1Pro 时，先定义能跨人类和机器人共享的动作空间。</p>
+        </div>
+        <div class="card">
+          <h3>3. 离线指标需要和真机指标绑定</h3>
+          <p>EgoScale 的 scaling law 之所以有价值，是因为 human validation loss 跟 robot completion score 对上了。你自己的系统也可以设计类似 offline metric，然后用少量真机 eval 验证它是否能预测成功率。</p>
+        </div>
+        <div class="card">
+          <h3>4. One-shot 不是免费来的</h3>
+          <p>one-shot 成立的条件是：预训练见过足够多通用 motion primitives，mid-training 见过相近的对齐场景，post-training 再给一个目标 robot demo。少任何一环都容易塌。</p>
+        </div>
+      </div>
+
+      <h3>如果要转成自己的实验计划</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>阶段</th>
+            <th>最低可行版本</th>
+            <th>风险点</th>
+            <th>可观测指标</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>人类数据动作化</td>
+            <td>先用少量第一视角视频跑手部 tracking，输出 wrist delta + hand keypoints / joint targets。</td>
+            <td>遮挡、相机抖动、左右手 ID swap。</td>
+            <td>手腕轨迹平滑度、retargeting failure rate、手指闭合时序。</td>
+          </tr>
+          <tr>
+            <td>对齐数据</td>
+            <td>采同一任务的人类演示和机器人 teleop，保证相机视角与动作空间可比。</td>
+            <td>人类动作和机器人动作语义相同但物理路径不同。</td>
+            <td>同任务 human/robot embedding 距离、action distribution overlap。</td>
+          </tr>
+          <tr>
+            <td>模型训练</td>
+            <td>冻结大部分 VLM，只训练 action expert / adapter，避免算力爆炸。</td>
+            <td>小数据过拟合，action normalization 错位。</td>
+            <td>held-out action MSE、chunk consistency、真机 rollout partial score。</td>
+          </tr>
+          <tr>
+            <td>真机验证</td>
+            <td>先做 2-3 个接触敏感任务，例如卡片、瓶盖、工具抓取。</td>
+            <td>成功率方差大，初始化条件影响明显。</td>
+            <td>binary success + task completion score + failure taxonomy。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>和 DreamZero 类工作的区别</h3>
+      <div class="callout gold">
+        EgoScale 的主线是“动作标签化的人类第一视角数据 + VLA action generation + 对齐迁移”；DreamZero/WAM 类工作更强调“世界模型式未来视频/动作联合生成”和自回归闭环。两者都关心视频和动作，但 EgoScale 的贡献更偏数据规模、动作表示和人机对齐配方。
+      </div>
+    </section>
+
+    <section>
+      <h2>术语速查</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>术语</th>
+            <th>在本文中的含义</th>
+            <th>不要误解成</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Egocentric human data</td>
+            <td>第一视角人类操作视频，配合估计出来的 camera motion 和 hand pose。</td>
+            <td>不是天然带机器人动作的 imitation dataset。</td>
+          </tr>
+          <tr>
+            <td>Action-labeled video</td>
+            <td>通过感知和 retargeting 管线得到 wrist/hand action supervision。</td>
+            <td>不是人工逐帧标注动作。</td>
+          </tr>
+          <tr>
+            <td>Mid-training</td>
+            <td>在匹配视角和控制接口的人机 play data 上继续训练，使表示落到机器人空间。</td>
+            <td>不是最后的任务微调，也不是大规模预训练。</td>
+          </tr>
+          <tr>
+            <td>One-shot transfer</td>
+            <td>目标任务 post-training 中只有一个 robot demonstration，同时有 aligned human demonstrations。</td>
+            <td>不是完全零机器人示范。</td>
+          </tr>
+          <tr>
+            <td>Embodiment-agnostic motor prior</td>
+            <td>人类手部动作结构可经 adapter 迁移到不同机器人。</td>
+            <td>不是一个模型直接控制任意机械手。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="sources">
+      <h2>来源与链接</h2>
+      <ul>
+        <li>arXiv 论文页：<a href="https://arxiv.org/abs/2602.16710">EgoScale: Scaling Dexterous Manipulation with Diverse Egocentric Human Data</a></li>
+        <li>arXiv HTML：<a href="https://ar5iv.labs.arxiv.org/html/2602.16710v1">2602.16710v1 HTML</a></li>
+        <li>NVIDIA GEAR 项目页：<a href="https://research.nvidia.com/labs/gear/egoscale/">EgoScale project page</a></li>
+      </ul>
+      <p class="small">
+        注：本文档中的“我的阅读判断”“工程启发”“质疑清单”是基于论文内容的分析，不是论文作者原文结论。
+      </p>
+    </section>
+  </div>
+</body>
+</html>

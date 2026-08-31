@@ -1,0 +1,32 @@
+aruco_door_observer:
+  ros__parameters:
+    image_topic: /camera/image_raw
+    door_observation_topic: /door_observation
+    dictionary_name: DICT_6X6_1000
+    marker_to_room_json: '{"902":"902","904":"904","100":"START","101":"CORRIDOR_TURN"}'
+    min_marker_area_px: 350.0
+
+topology_manager:
+  ros__parameters:
+    target_room: "904"
+    door_observation_topic: /door_observation
+    topo_command_topic: /topo_command
+    confirmation_window: 5
+    confirmation_votes: 3
+    min_confidence: 0.70
+    target_side_fallback: right
+
+reactive_local_controller:
+  ros__parameters:
+    scan_topic: /scan
+    topo_command_topic: /topo_command
+    cmd_vel_topic: /cmd_vel
+    control_hz: 10.0
+    nominal_speed: 0.20
+    search_speed: 0.12
+    stop_distance: 0.42
+    slow_distance: 0.75
+    corridor_kp: 0.65
+    max_yaw_rate: 0.55
+    enter_yaw_rate: 0.38
+    enter_duration_s: 2.7

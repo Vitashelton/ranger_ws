@@ -1,0 +1,4 @@
+[console_scripts]
+evaluate_layouts = tag2nav_demo.evaluate_layouts:main
+layout_publisher = tag2nav_demo.layout_publisher:main
+optimize_tags = tag2nav_demo.optimize_tags:main

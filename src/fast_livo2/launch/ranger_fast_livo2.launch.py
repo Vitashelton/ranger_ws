@@ -76,7 +76,6 @@ def generate_launch_description():
         respawn=LaunchConfiguration('use_respawn'),
     )
 
-
     rviz_node = Node(
         condition=IfCondition(LaunchConfiguration('use_rviz')),
         package='rviz2',

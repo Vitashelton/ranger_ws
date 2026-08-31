@@ -1,0 +1,8 @@
+# Copy to ~/.config/ranger_nav/room_markers.yaml after observing the real IDs.
+dictionary: DICT_6X6_1000
+markers: {}
+# Example only after a physical marker has actually been installed:
+# markers:
+#   "17":
+#     entity_id: room1
+#     role: room_anchor

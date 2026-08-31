@@ -1,0 +1,4 @@
+$xelatex = 'xelatex -shell-escape -synctex=1 -interaction=nonstopmode -file-line-error %O %S';
+$bibtex = 'biber %O %S';
+$pdf_mode = 1;
+$postscript_mode = $dvi_mode = 0;

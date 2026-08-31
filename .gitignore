@@ -43,6 +43,8 @@ terrain_flat_02ms_01/
 *.swo
 *~
 *.md
+!AGENTS.md
+!docs/THESIS_SCOPE_ZH.md
 
 # IDE / editor
 .vscode/

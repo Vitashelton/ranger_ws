@@ -11,6 +11,8 @@
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>livox_ros_driver2</depend>
 
   <export>
     <build_type>ament_python</build_type>

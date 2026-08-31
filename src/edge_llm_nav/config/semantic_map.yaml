@@ -1,0 +1,29 @@
+nodes:
+  - node_id: charging_station
+    semantic_label: charging station
+    aliases: [充电桩, 充电站, charger]
+    pose: {x: 0.0, y: 0.0, yaw: 0.0, frame_id: map}
+    confirmation_target: charging_marker
+    visibility_region: charging_area
+    nav_reachable: true
+  - node_id: lab_door
+    semantic_label: laboratory door
+    aliases: [实验室, 实验室门口, lab]
+    pose: {x: 2.0, y: 1.0, yaw: 0.0, frame_id: map}
+    confirmation_target: lab_sign
+    visibility_region: lab_corridor
+    nav_reachable: true
+  - node_id: room_203
+    semantic_label: room 203 door
+    aliases: [203门口, 203房间]
+    pose: {x: 4.0, y: 1.0, yaw: 1.57, frame_id: map}
+    confirmation_target: room_203_sign
+    visibility_region: east_corridor
+    nav_reachable: true
+  - node_id: corridor
+    semantic_label: corridor
+    aliases: [走廊, 通道]
+    pose: {x: 1.0, y: 3.0, yaw: 1.57, frame_id: map}
+    confirmation_target: corridor_marker
+    visibility_region: main_corridor
+    nav_reachable: true

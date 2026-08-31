@@ -1,0 +1,17 @@
+frame_id: map
+
+# Record real poses with lab_waypoint_demo.py. Do not put simulated coordinates
+# in the physical demo database.
+waypoints: {}
+
+# A route is an ordered list of recorded waypoint names. Add corridor relay
+# points every few metres when a room or the elevator is outside the rolling
+# global costmap.
+routes:
+  all_rooms: []
+
+aliases:
+  电梯: elevator
+  电梯口: elevator
+  找电梯: elevator
+  全部房间: all_rooms

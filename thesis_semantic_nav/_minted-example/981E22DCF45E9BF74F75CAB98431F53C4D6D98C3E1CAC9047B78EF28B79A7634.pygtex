@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 走廊语义导航基准测试（无Gazebo，含RViz）}
+ros2 launch rangermini\PYGZus{}doorway\PYGZus{}sim corridor\PYGZus{}semantic\PYGZus{}benchmark.launch.py \PYG{l+s+se}{\PYGZbs{}}
+  use\PYGZus{}gazebo:\PYG{o}{=}\PYG{n+nb}{false} \PYG{l+s+se}{\PYGZbs{}}
+  launch\PYGZus{}rviz:\PYG{o}{=}\PYG{n+nb}{true} \PYG{l+s+se}{\PYGZbs{}}
+  human\PYGZus{}mode:\PYG{o}{=}unsafe\PYGZus{}centerline
+
+\PYG{c+c1}{\PYGZsh{} 切换语义目标}
+ros2 run rangermini\PYGZus{}doorway\PYGZus{}sim semantic\PYGZus{}cmd go to \PYG{l+m}{906}
+ros2 run rangermini\PYGZus{}doorway\PYGZus{}sim semantic\PYGZus{}cmd nearest glass door
+ros2 run rangermini\PYGZus{}doorway\PYGZus{}sim semantic\PYGZus{}cmd 去904
+
+\PYG{c+c1}{\PYGZsh{} 计算试验指标}
+ros2 run rangermini\PYGZus{}doorway\PYGZus{}sim corridor\PYGZus{}trial\PYGZus{}metrics \PYG{l+s+se}{\PYGZbs{}}
+  \PYGZhy{}\PYGZhy{}log\PYGZus{}dir /tmp/rangermini\PYGZus{}corridor\PYGZus{}logs
+
+\PYG{c+c1}{\PYGZsh{} 绘制最新日志}
+ros2 run rangermini\PYGZus{}doorway\PYGZus{}sim plot\PYGZus{}latest\PYGZus{}log \PYG{l+s+se}{\PYGZbs{}}
+  \PYGZhy{}\PYGZhy{}log\PYGZus{}dir /tmp/rangermini\PYGZus{}corridor\PYGZus{}logs
+\end{Verbatim}

@@ -80,7 +80,7 @@ git commit -m "ranger_nav: initial commit"
 **commit message 怎么写？**
 - 第一行简短总结（< 50 字），英文或中文都行
 - 多人协作建议英文：`ranger_nav: add SLAM config and launch files`
-- 个人项目中文就行：`添加 pointcloud_to_laserscan 高度滤波参数调优`
+- 个人项目中文就行：`调整 MID360S 体素障碍层高度参数`
 
 ---
 
@@ -158,7 +158,7 @@ git push origin main
 git status
 
 # 2. 添加要提交的改动
-git add config/pointcloud_to_laserscan.yaml    # 只加这个文件
+git add config/nav2_pointcloud_params.yaml    # 只加这个文件
 # 或
 git add .                                       # 加所有改动
 

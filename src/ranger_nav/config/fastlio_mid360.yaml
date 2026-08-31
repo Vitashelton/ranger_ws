@@ -21,7 +21,9 @@
         common:
             lid_topic: "/livox/lidar"
             imu_topic: "/livox/imu"
-            time_sync_en: false            # MID360 has hardware sync via livox_ros_driver2
+            # MID-360S publishes LiDAR and IMU on the same hardware clock.
+            # Keep software sync off; its startup estimator is only a fallback.
+            time_sync_en: false
             time_offset_lidar_to_imu: 0.0
 
         # --- LiDAR preprocess ---
@@ -50,12 +52,12 @@
         publish:
             path_en: true                  # /path topic (odom trajectory)
             effect_map_en: false           # debug: effects pointcloud
-            map_en: true                   # map pointcloud (accumulated)
+            map_en: false                  # save Jetson memory; enable only for map export
             scan_publish_en: true          # /cloud_registered (current scan in world frame)
             dense_publish_en: false        # dense map (can throttle CPU)
             scan_bodyframe_pub_en: true    # /cloud_registered_body (scan in IMU body frame)
 
         # --- PCD save ---
         pcd_save:
-            pcd_save_en: true
+            pcd_save_en: false             # never write a huge PCD during normal navigation
             interval: -1                   # -1 = save all as one PCD; >0 = save every N frames

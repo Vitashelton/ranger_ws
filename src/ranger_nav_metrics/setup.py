@@ -21,6 +21,7 @@ setup(
         'console_scripts': [
             'metrics_logger = ranger_nav_metrics.metrics_logger:main',
             'bag_analyzer = ranger_nav_metrics.bag_analyzer:main',
+            'timing_monitor = ranger_nav_metrics.timing_monitor:main',
         ],
     },
 )

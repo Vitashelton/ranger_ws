@@ -1,0 +1,210 @@
+# Ranger Mini 2.0 navigation using native MID360S PointCloud2.
+# No /scan, AMCL, static map, or pointcloud_to_laserscan is used here.
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: false
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /odom
+    bt_loop_duration: 100
+    default_server_timeout: 20
+    navigators: ["navigate_to_pose"]
+    navigate_to_pose:
+      plugin: "nav2_bt_navigator/NavigateToPoseNavigator"
+
+controller_server:
+  ros__parameters:
+    use_sim_time: false
+    controller_frequency: 15.0
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.001
+    min_theta_velocity_threshold: 0.001
+    progress_checker_plugin: progress_checker
+    goal_checker_plugins: [general_goal_checker]
+    controller_plugins: [FollowPath]
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.20
+      movement_time_allowance: 15.0
+    general_goal_checker:
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.20
+      yaw_goal_tolerance: 0.20
+      stateful: true
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: false
+      # The chassis converts vx+wz to Dual Ackermann and vx=0+wz to Spin.
+      # Reverse is disabled for the first physical validation.
+      min_vel_x: 0.0
+      min_vel_y: 0.0
+      max_vel_x: 0.30
+      max_vel_y: 0.0
+      max_vel_theta: 0.60
+      min_speed_xy: 0.0
+      max_speed_xy: 0.30
+      min_speed_theta: 0.0
+      acc_lim_x: 0.35
+      acc_lim_y: 0.0
+      acc_lim_theta: 0.8
+      dec_lim_x: -0.50
+      dec_lim_y: 0.0
+      dec_lim_theta: -1.0
+      vx_samples: 15
+      vy_samples: 0
+      vtheta_samples: 30
+      sim_time: 2.0
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      transform_tolerance: 0.4
+      xy_goal_tolerance: 0.20
+      trans_stopped_velocity: 0.03
+      short_circuit_trajectory_evaluation: true
+      stateful: true
+      critics: ["RotateToGoal", "Oscillation", "ObstacleFootprint",
+                "GoalAlign", "PathAlign", "PathDist", "GoalDist", "PreferForward"]
+      RotateToGoal.scale: 20.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
+      Oscillation.scale: 1.0
+      ObstacleFootprint.scale: 30.0
+      GoalAlign.scale: 12.0
+      PathAlign.scale: 20.0
+      PathDist.scale: 24.0
+      GoalDist.scale: 16.0
+      PreferForward.scale: 8.0
+
+planner_server:
+  ros__parameters:
+    use_sim_time: false
+    expected_planner_frequency: 2.0
+    planner_plugins: [GridBased]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      tolerance: 0.5
+      use_astar: true
+      allow_unknown: true
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: false
+    local_costmap_topic: /local_costmap/costmap_raw
+    global_costmap_topic: /global_costmap/costmap_raw
+    local_footprint_topic: /local_costmap/published_footprint
+    global_footprint_topic: /global_costmap/published_footprint
+    cycle_frequency: 10.0
+    behavior_plugins: [spin, wait]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+    global_frame: map
+    robot_base_frame: base_link
+    transform_tolerance: 0.4
+    simulate_ahead_time: 2.0
+    max_rotational_vel: 0.60
+    min_rotational_vel: 0.15
+    rotational_acc_lim: 0.8
+
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: false
+    loop_rate: 10
+    stop_on_failure: true
+    waypoint_task_executor_plugin: wait_at_waypoint
+    wait_at_waypoint:
+      plugin: "nav2_waypoint_follower::WaitAtWaypoint"
+      wait_duration: 500
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: map
+      robot_base_frame: base_link
+      update_frequency: 3.0
+      publish_frequency: 1.0
+      transform_tolerance: 0.4
+      resolution: 0.08
+      robot_radius: 0.35
+      rolling_window: true
+      width: 12.0
+      height: 12.0
+      track_unknown_space: false
+      always_send_full_costmap: false
+      plugins: [voxel_layer, inflation_layer]
+      voxel_layer:
+        plugin: "nav2_costmap_2d::VoxelLayer"
+        enabled: true
+        observation_sources: mid360s
+        mid360s:
+          topic: /nav/points
+          data_type: PointCloud2
+          min_obstacle_height: 0.10
+          max_obstacle_height: 1.80
+          clearing: true
+          marking: true
+          obstacle_min_range: 0.50
+          obstacle_max_range: 7.0
+          raytrace_min_range: 0.50
+          raytrace_max_range: 8.0
+        publish_voxel_map: false
+        footprint_clearing_enabled: true
+        origin_z: 0.0
+        z_resolution: 0.10
+        z_voxels: 16
+        unknown_threshold: 15
+        mark_threshold: 1
+        combination_method: 1
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: true
+        inflation_radius: 0.60
+        cost_scaling_factor: 3.0
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: odom
+      robot_base_frame: base_link
+      update_frequency: 8.0
+      publish_frequency: 3.0
+      transform_tolerance: 0.4
+      resolution: 0.05
+      robot_radius: 0.35
+      rolling_window: true
+      width: 6.0
+      height: 6.0
+      track_unknown_space: false
+      always_send_full_costmap: false
+      plugins: [voxel_layer, inflation_layer]
+      voxel_layer:
+        plugin: "nav2_costmap_2d::VoxelLayer"
+        enabled: true
+        observation_sources: mid360s
+        mid360s:
+          topic: /nav/points
+          data_type: PointCloud2
+          min_obstacle_height: 0.10
+          max_obstacle_height: 1.80
+          clearing: true
+          marking: true
+          obstacle_min_range: 0.50
+          obstacle_max_range: 5.0
+          raytrace_min_range: 0.50
+          raytrace_max_range: 6.0
+        publish_voxel_map: true
+        footprint_clearing_enabled: true
+        origin_z: 0.0
+        z_resolution: 0.10
+        z_voxels: 16
+        unknown_threshold: 15
+        mark_threshold: 1
+        combination_method: 1
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: true
+        inflation_radius: 0.60
+        cost_scaling_factor: 3.0

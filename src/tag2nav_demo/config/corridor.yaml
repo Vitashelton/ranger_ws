@@ -1,0 +1,38 @@
+random_seed: 7
+tag_budget: 4
+visibility_range_m: 4.5
+visibility_half_fov_deg: 55.0
+relocalization_radius_m: 5.0
+
+# A compact corridor digital twin. Candidate tags can later be generated from
+# Gazebo model poses or a recorded mapping run.
+candidates:
+  - {id: 10, name: start,       x: 1.0,  y: 0.0, yaw_deg: 0,   quality: 0.90}
+  - {id: 11, name: room_902,    x: 3.0,  y: 2.0, yaw_deg: -90, quality: 0.82}
+  - {id: 12, name: junction_a,  x: 6.0,  y: 0.0, yaw_deg: 180, quality: 0.95}
+  - {id: 13, name: room_904,    x: 8.0,  y: 2.0, yaw_deg: -90, quality: 0.78}
+  - {id: 14, name: room_906,    x: 12.0, y: 2.0, yaw_deg: -90, quality: 0.88}
+  - {id: 15, name: junction_b,  x: 14.0, y: 0.0, yaw_deg: 180, quality: 0.94}
+  - {id: 16, name: room_908,    x: 18.0, y: 2.0, yaw_deg: -90, quality: 0.80}
+  - {id: 17, name: elevator,    x: 21.0, y: 0.0, yaw_deg: 180, quality: 0.92}
+
+# Each route is sampled into poses [x, y, robot_yaw_deg]. Weight is the task
+# frequency. Degeneracy marks repeated/feature-poor corridor sections where a
+# visual anchor is more valuable to LiDAR relocalization.
+tasks:
+  - name: deliver_906
+    weight: 0.50
+    route: [[1,0,0],[3,0,0],[5,0,0],[7,0,0],[9,0,0],[11,0,0],[12,1,45]]
+  - name: meeting_908
+    weight: 0.30
+    route: [[1,0,0],[4,0,0],[7,0,0],[10,0,0],[13,0,0],[16,0,0],[18,1,45]]
+  - name: go_elevator
+    weight: 0.15
+    route: [[1,0,0],[5,0,0],[9,0,0],[13,0,0],[17,0,0],[21,0,0]]
+  - name: visit_902
+    weight: 0.05
+    route: [[1,0,0],[2,0,0],[3,1,45]]
+
+degeneracy_zones:
+  - {xmin: 4.0, xmax: 10.0, ymin: -1.0, ymax: 1.0, severity: 0.85}
+  - {xmin: 11.0, xmax: 18.0, ymin: -1.0, ymax: 1.0, severity: 0.95}
